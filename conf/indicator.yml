@@ -1,0 +1,5 @@
+rsi:
+  ohlc: Close
+  window: 14
+  upper: 70
+  lower: 30

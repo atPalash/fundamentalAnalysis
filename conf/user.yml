@@ -1,0 +1,11 @@
+# to debug logic use one stock as test.
+debug_stock:  ''
+# log folder
+log_folder: log
+# path where the result csv is created.
+result_folder: result
+
+yf_interval: 1h
+yf_period: 1y
+# stop the analysis
+stop: False

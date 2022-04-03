@@ -1,3 +1,2 @@
-2022-04-03 12:06:14,447-INFO-D:/pythonProjects/fundamentalAnalysis/main.py-5-STARTING ANALYSIS
-2022-04-03 12:06:14,769-INFO-D:\pythonProjects\fundamentalAnalysis\dataAnalysis\indicators\rsi.py-40-SBIN.NS: rsi=73.59186366172113
-2022-04-03 12:06:15,068-DEBUG-Webhook ID 960081289690644550 with POST /?wait=0 has returned status code 204
+2022-04-03 13:41:14,293-INFO-D:/pythonProjects/fundamentalAnalysis/main.py-5-STARTING ANALYSIS
+2022-04-03 13:41:14,657-INFO-D:\pythonProjects\fundamentalAnalysis\dataAnalysis\indicators\rsi.py-39-SBIN.NS: rsi=73.59186366172113

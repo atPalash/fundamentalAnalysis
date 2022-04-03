@@ -38,7 +38,7 @@ class Orchestrator:
                                        lower=self.indicator_config['rsi']['lower'])
                 tickers_rsi = TickersRsi(rsi_config, data=data)
                 tickers_rsi.do_analysis(selected_stocks=selected_stocks)
-                print(tickers_rsi.count)
+
                 time.sleep(1)
 
             except Exception as e:

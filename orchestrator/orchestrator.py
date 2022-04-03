@@ -2,7 +2,7 @@ import time
 
 from utility.reader import read_config
 from utility.logger import Logger, LogLevel
-from dataFetch.yfinanceLiveData import YFinanceLiveData
+from dataFetch.yfinance_live_data import YFinanceLiveData
 from dataAnalysis.indicators.rsi import RsiConfig, TickersRsi
 
 
@@ -18,6 +18,7 @@ class Orchestrator:
     def run(self):
         selected_stocks = self.selected_stocks_config['to_buy'] + self.selected_stocks_config['to_sell']
         selected_stocks = [stock + ".NS" for stock in selected_stocks]
+        tickers = {}
 
         while not self.user_config['stop']:
             try:
@@ -37,7 +38,7 @@ class Orchestrator:
                                        lower=self.indicator_config['rsi']['lower'])
                 tickers_rsi = TickersRsi(rsi_config, data=data)
                 tickers_rsi.do_analysis(selected_stocks=selected_stocks)
-
+                print(tickers_rsi.count)
                 time.sleep(1)
 
             except Exception as e:

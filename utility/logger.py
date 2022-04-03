@@ -2,6 +2,7 @@ import logging
 from enum import Enum
 from inspect import getframeinfo, stack
 from urllib3 import connectionpool
+from discord import Webhook
 
 
 class LogLevel(Enum):
@@ -28,6 +29,7 @@ class Logger:
 
             # http CRITICAL level to be logged only
             logging.getLogger(connectionpool.__name__).setLevel(logging.CRITICAL)
+            logging.getLogger(Webhook.__name__).setLevel(logging.CRITICAL)
         return Logger._logger
 
     @staticmethod

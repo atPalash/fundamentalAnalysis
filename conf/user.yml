@@ -4,8 +4,10 @@ debug_stock:  ''
 log_folder: log
 # path where the result csv is created.
 result_folder: result
-
-yf_interval: 1h
-yf_period: 1y
+# yahoo finance parameters
+yf_interval: 60m
+yf_period: 2y
+# poll interval in minutes should be similar to yf_interval above
+poll_interval: 60
 # stop the analysis
 stop: False

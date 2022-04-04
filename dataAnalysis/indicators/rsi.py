@@ -1,5 +1,7 @@
 import traceback
 
+import numpy
+
 from dataAnalysis.indicators.config import Config
 from dataAnalysis.indicators.indicator import Indicator
 from utility.discord_bot import DiscordBot, DiscordBotChannel
@@ -30,8 +32,9 @@ class TickersRsi(Indicator):
         try:
             for stock in selected_stocks:
                 # compute indicator analysis
-                rsi_result = self.__get_result(self.data[self.config.ohlc][stock])
-                # Logger.log(msg=f"{stock} Rsi value={rsi_result[-1]}", log_level=LogLevel.Info)
+                data = self.data[self.config.ohlc][stock]
+                rsi_result = self.__get_result(data)
+                Logger.log(msg=f"{stock} Rsi value={rsi_result[-1]}", log_level=LogLevel.Info)
                 msg = f"{stock}: rsi={rsi_result[-1]}"
 
                 if rsi_result[-1] > self.config.upper:
@@ -55,6 +58,7 @@ class TickersRsi(Indicator):
                         _rsi_above_upper_stocks.pop(stock)
         except Exception as e:
             Logger.log(msg=f"exception during rsi analysis: {traceback.format_exc()}", log_level=LogLevel.Critical)
+            DiscordBot.send_message(DiscordBotChannel.GENERAL, msg="exception during rsi analysis, check logs")
 
     def __get_result(self, col_data):
         rsi = talib.RSI(col_data, timeperiod=self.config.timeperiod)

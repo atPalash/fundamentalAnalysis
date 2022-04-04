@@ -13,6 +13,7 @@ class YFinanceLiveData:
     def get_ticker_data(self):
         self.data = yf.download(tickers=self.stock_config['tickers'], period=self.stock_config['period'],
                                 interval=self.stock_config['interval'], progress=False)
+        self.data = self.data.fillna(method="ffill")
         return self.data
 
     def plot_data(self):

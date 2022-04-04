@@ -9,9 +9,9 @@ class DiscordBotChannel(Enum):
 
 
 class DiscordBot:
-    _general_url = "https://discord.com/api/webhooks/960081046647492618/LWhY4ftN_RsMrtoYMOPFk1sScW0YC_zMY7vuHO0OmtJrm6oYol8BHWNSXBmTjU3xxI-e"
-    _sell_url = "https://discord.com/api/webhooks/960081289690644550/QcXzoKKiOQiVbfDLD5SggQSWHp8HXudorYEINcwEduWrGO3-hsjob5JNF4svJo7szmrk"
-    _buy_url = "https://discord.com/api/webhooks/960081364672192542/oYJz6c8yy5EqzFNeiupGTOWNBefRYYdln8SfOvm9jN-g33E9gI-lzxh0-Htoq6jGXsqI"
+    _general_url = "https://discord.com/api/webhooks/960272984977854535/YZw8kDtbSOyC1epj-S2_VaoE61z1GQg1Z-__53Ck-eD7a-pnNSEJwNWZ7dhClvHVhKga"
+    _sell_url = "https://discord.com/api/webhooks/960273089256644658/WtzbdclvQCOkYrcgjsAbVCsuTnbcIl0mfeoIPv6-io0b92mJRQuhM1AYm6_OKfrqiBMP"
+    _buy_url = "https://discord.com/api/webhooks/960273172610023425/Sh7QXscdduMDnFgsNLc9OIE0op83mG_EiUeNwGdkDcPMdaRDqhobSxbnpyMy4CHWTZ-q"
 
     _general_webhook = None
     _buy_webhook = None

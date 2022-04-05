@@ -34,7 +34,7 @@ class TickersRsi(Indicator):
                 # compute indicator analysis
                 data = self.data[self.config.ohlc][stock]
                 rsi_result = self.__get_result(data)
-                Logger.log(msg=f"{stock} Rsi value={rsi_result[-1]}", log_level=LogLevel.Info)
+                # Logger.log(msg=f"{stock} Rsi value={rsi_result[-1]}", log_level=LogLevel.Info)
                 msg = f"{stock}: rsi={rsi_result[-1]}"
 
                 if rsi_result[-1] > self.config.upper:

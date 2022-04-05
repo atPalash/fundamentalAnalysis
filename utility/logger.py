@@ -19,7 +19,7 @@ class Logger:
     @staticmethod
     def __initialise():
         if Logger._logger is None:
-            logging.basicConfig(filename="logs/all.log",
+            logging.basicConfig(filename="/home/pi/Dev/fundamentalAnalysis/logs/all.log",
                                 format='%(asctime)s-%(levelname)s-%(message)s',
                                 filemode='w')
             Logger._logger = logging.getLogger()

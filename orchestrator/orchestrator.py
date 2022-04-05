@@ -1,5 +1,5 @@
 import time
-
+import traceback
 from utility.reader import read_config
 from utility.logger import Logger, LogLevel
 from utility.discord_bot import DiscordBot, DiscordBotChannel
@@ -51,7 +51,7 @@ class Orchestrator:
                 self.user_config = read_config(self.user_config_file)
 
             except Exception as e:
-                Logger.log(msg=f"exception during run: {str(e)}", log_level=LogLevel.Critical)
+                Logger.log(msg=f"exception during run: {traceback.format_exc()}", log_level=LogLevel.Critical)
                 DiscordBot.send_message(DiscordBotChannel.GENERAL, msg=f"exception during run: {str(e)}")
 
 

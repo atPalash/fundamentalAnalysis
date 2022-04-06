@@ -5,6 +5,5 @@ test
 ta-lib
 get-pip.py
 .vscode/launch.json
-logs/all.log
 conf/discord.yml
 logs/all.log

@@ -23,8 +23,8 @@ class Orchestrator:
 
         while not self.user_config['stop']:
             try:
-
                 start_time = time.time()
+                # DiscordBot.send_message(msg=str(start_time), channel=DiscordBotChannel.GENERAL)
                 # fetch data till current
                 stock_config = {
                     'tickers': selected_stocks,
@@ -43,7 +43,7 @@ class Orchestrator:
                 tickers_rsi.do_analysis(selected_stocks=selected_stocks)
 
                 end_time = time.time()
-                delay = self.user_config['poll_interval']*60/3 - (end_time - start_time)
+                delay = self.user_config['poll_interval']*60 - (end_time - start_time)
                 msg = f"starting next batch after {delay}s"
                 Logger.log(msg=msg, log_level=LogLevel.Info)
                 DiscordBot.send_message(msg=msg, channel=DiscordBotChannel.GENERAL)

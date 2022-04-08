@@ -5,6 +5,8 @@ from utility.logger import Logger, LogLevel
 from utility.discord_bot import DiscordBot, DiscordBotChannel
 from dataFetch.yfinance_live_data import YFinanceLiveData
 from dataAnalysis.indicators.rsi import RsiConfig, TickersRsi
+from pytz import timezone
+import datetime
 
 
 class Orchestrator:
@@ -23,7 +25,9 @@ class Orchestrator:
 
         while not self.user_config['stop']:
             try:
+                nse_delay = self.is_nse_open()
                 start_time = time.time()
+
                 # DiscordBot.send_message(msg=str(start_time), channel=DiscordBotChannel.GENERAL)
                 # fetch data till current
                 stock_config = {
@@ -43,7 +47,8 @@ class Orchestrator:
                 tickers_rsi.do_analysis(selected_stocks=selected_stocks)
 
                 end_time = time.time()
-                delay = self.user_config['poll_interval']*60 - (end_time - start_time)
+                delay = nse_delay * 60 - (end_time - start_time)
+
                 msg = f"starting next batch after {delay}s"
                 Logger.log(msg=msg, log_level=LogLevel.Info)
                 DiscordBot.send_message(msg=msg, channel=DiscordBotChannel.GENERAL)
@@ -54,9 +59,50 @@ class Orchestrator:
                 Logger.log(msg=f"exception during run: {traceback.format_exc()}", log_level=LogLevel.Critical)
                 DiscordBot.send_message(DiscordBotChannel.GENERAL, msg=f"exception during run: {str(e)}")
 
+    def is_nse_open(self):
+        time_zone = timezone("Asia/Kolkata")
+        ind_time = datetime.datetime.now(timezone("Asia/Kolkata"))
 
+        nse_open = self.user_config['nse']['open'].split(':')
+        nse_open_hour = int(nse_open[0])
+        nse_open_minute = int(nse_open[1])
+        nse_close = self.user_config['nse']['close'].split(':')
+        nse_close_hour = int(nse_close[0])
+        nse_close_minute = int(nse_close[1])
 
+        day_of_week = ind_time.isoweekday()
+        today_open_time = datetime.datetime(year=ind_time.year, month=ind_time.month, day=ind_time.day,
+                                            hour=nse_open_hour, minute=nse_open_minute, tzinfo=time_zone)
+        today_close_time = datetime.datetime(year=ind_time.year, month=ind_time.month, day=ind_time.day,
+                                             hour=nse_close_hour, minute=nse_close_minute, tzinfo=time_zone)
 
+        def get_day_delay_minutes():
+            delay_mins = self.user_config['poll_interval']
 
+            # Saturday
+            if day_of_week == 6:
+                monday_open_time = today_open_time + datetime.timedelta(hours=24 * 2)
+                delay_mins = (monday_open_time - ind_time).total_seconds() / 60
+            # Sunday
+            elif day_of_week == 0:
+                monday_open_time = today_open_time + datetime.timedelta(hours=24)
+                delay_mins = (monday_open_time - ind_time).total_seconds() / 60
+            else:
+                if today_open_time <= ind_time <= today_close_time:
+                    delay_mins = self.user_config['poll_interval']
+                else:
+                    if ind_time < today_open_time:
+                        delay_mins = (today_open_time - ind_time).total_seconds() / 60
+                    elif ind_time > today_close_time:
+                        tomorrow_open_time = today_open_time + datetime.timedelta(hours=24)
+                        delay_mins = (tomorrow_open_time - ind_time).total_seconds() / 60
 
+                        # Friday end
+                        if day_of_week == 5:
+                            monday_open_time = today_open_time + datetime.timedelta(hours=24 * 3)
+                            delay_mins = (monday_open_time - ind_time).total_seconds() / 60
 
+            return delay_mins
+
+        delay_minutes = get_day_delay_minutes()
+        return delay_minutes

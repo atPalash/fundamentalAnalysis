@@ -11,3 +11,7 @@ yf_period: 2y
 poll_interval: 60
 # stop the analysis
 stop: False
+# Nse details
+nse:
+  open: "9:15"
+  close: "15:30"

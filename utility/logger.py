@@ -2,7 +2,8 @@ import logging
 from enum import Enum
 from inspect import getframeinfo, stack
 from urllib3 import connectionpool
-from discord import webhook
+from discord import client, webhook
+from pathlib import Path
 
 
 class LogLevel(Enum):
@@ -19,7 +20,10 @@ class Logger:
     @staticmethod
     def __initialise():
         if Logger._logger is None:
-            logging.basicConfig(filename="/home/pi/Dev/fundamentalAnalysis/logs/all.log",
+            log_folder = Path("logs")
+            all_log = log_folder / "all.log"
+            all_log = all_log.resolve(strict=True).as_posix()
+            logging.basicConfig(filename=all_log,
                                 format='%(asctime)s-%(levelname)s-%(message)s',
                                 filemode='w')
             Logger._logger = logging.getLogger()
@@ -30,6 +34,7 @@ class Logger:
             # http CRITICAL level to be logged only
             logging.getLogger(connectionpool.__name__).setLevel(logging.CRITICAL)
             logging.getLogger(webhook.__name__).setLevel(logging.CRITICAL)
+            logging.getLogger('discord').setLevel(logging.CRITICAL)
         return Logger._logger
 
     @staticmethod

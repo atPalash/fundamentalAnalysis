@@ -2,7 +2,7 @@ import time
 import traceback
 from utility.reader import read_config
 from utility.logger import Logger, LogLevel
-from utility.discord_bot import DiscordBot, DiscordBotChannel
+from utility.discordBot.discord_bot import DiscordBot, DiscordBotChannel
 from dataFetch.yfinance_live_data import YFinanceLiveData
 from dataAnalysis.indicators.rsi import RsiConfig, TickersRsi
 from pytz import timezone

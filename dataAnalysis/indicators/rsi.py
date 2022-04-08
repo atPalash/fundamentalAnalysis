@@ -1,10 +1,8 @@
 import traceback
 
-import numpy
-
 from dataAnalysis.indicators.config import Config
 from dataAnalysis.indicators.indicator import Indicator
-from utility.discord_bot import DiscordBot, DiscordBotChannel
+from utility.discordBot.discord_bot import DiscordBot, DiscordBotChannel
 from utility.logger import Logger, LogLevel
 
 import talib

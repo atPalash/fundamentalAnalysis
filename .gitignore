@@ -6,4 +6,4 @@ ta-lib
 get-pip.py
 .vscode/launch.json
 conf/discord.yml
-logs/all.log
+*.log

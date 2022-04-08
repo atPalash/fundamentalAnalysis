@@ -1,0 +1,3 @@
+[submodule "utility/discordBot"]
+	path = utility/discordBot
+	url = https://github.com/atPalash/discordBot.git

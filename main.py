@@ -1,5 +1,5 @@
 from orchestrator.orchestrator import Orchestrator
-from utility.discord_bot import DiscordBot
+from utility.discordBot.discord_bot import DiscordBot
 from utility.logger import Logger, LogLevel
 from pathlib import Path
 

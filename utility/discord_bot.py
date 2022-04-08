@@ -1,6 +1,6 @@
+import threading
 from enum import Enum
 import discord
-from discord.ext import commands
 
 from utility.reader import read_config
 
@@ -12,14 +12,15 @@ class DiscordBotChannel(Enum):
     QUERY = 4
 
 
-'''
-Add webhook to discord to send message on channel
-'''
 class DiscordBot:
+    """
+    Add webhook to discord to send message on channel
+    """
     _general_webhook = None
     _buy_webhook = None
     _sell_webhook = None
     _is_bot_available = False
+    _discord_config = None
 
     @staticmethod
     def send_message(channel: DiscordBotChannel, msg):
@@ -37,10 +38,10 @@ class DiscordBot:
     @staticmethod
     def initialise(config):
         if DiscordBot._general_webhook is None:
-            discord_config = read_config(config)
-            general_url = discord_config['webhook']['general']
-            buy_url = discord_config['webhook']['buy']
-            sell_url = discord_config['webhook']['sell']
+            DiscordBot._discord_config = read_config(config)
+            general_url = DiscordBot._discord_config['webhook']['general']
+            buy_url = DiscordBot._discord_config['webhook']['buy']
+            sell_url = DiscordBot._discord_config['webhook']['sell']
 
             DiscordBot._general_webhook = discord.Webhook.from_url(
                 general_url, adapter=discord.RequestsWebhookAdapter())
@@ -49,31 +50,38 @@ class DiscordBot:
             DiscordBot._buy_webhook = discord.Webhook.from_url(
                 buy_url, adapter=discord.RequestsWebhookAdapter())
 
-            # stops execution check here
-            # client = discord.Client()
+            discord_listener = DiscordListener()
+            discord_listener.start()
 
-            # @client.event
-            # async def on_ready():
-            #     DiscordBot._is_bot_available = True
 
-            # @client.event
-            # async def on_message(message):
-            #     if not DiscordBot._is_bot_available:
-            #         DiscordBot.send_message("Bot unavailable", DiscordBotChannel.GENERAL)
-            #         return
-                
-            #     if message.author == client.user:
-            #         return
+class DiscordListener(threading.Thread, DiscordBot):
+    """
+    Initialise the Discord bot before initialising the listener for it
+    """
+    _client = None
 
-            #     if message.channel.name == "query":
-            #         await message.channel.send("lets do some query")
-            #     else:
-            #         await message.channel.send("Use query channel")
+    def __init__(self):
+        super().__init__()
+        if DiscordListener._client is None:
+            DiscordListener._client = discord.Client()
 
-            # client.run(discord_config['bot']['token'])
-    
+            @DiscordListener._client.event
+            async def on_ready():
+                DiscordBot._is_bot_available = True
 
-if __name__ == "__main__":
-    discord_config = "/home/pi/Dev/fundamentalAnalysis/conf/discord.yml"
-    DiscordBot.initialise(discord_config)
-    DiscordBot.send_message("hello", DiscordBotChannel.GENERAL)
+            @DiscordListener._client.event
+            async def on_message(message):
+                if not DiscordBot._is_bot_available:
+                    return
+
+                if message.author == DiscordListener._client.user:
+                    return
+
+                if message.channel.name == "query":
+                    await message.channel.send("lets do some query")
+
+        else:
+            raise Exception("Must not create multiple Discord listener")
+
+    def run(self):
+        DiscordListener._client.run(DiscordBot._discord_config['bot']['token'])

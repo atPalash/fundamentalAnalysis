@@ -1,3 +1,4 @@
+import asyncio
 import threading
 from enum import Enum
 import discord
@@ -21,6 +22,7 @@ class DiscordBot:
     _sell_webhook = None
     _is_bot_available = False
     _discord_config = None
+    _discord_listener = None
 
     @staticmethod
     def send_message(channel: DiscordBotChannel, msg):
@@ -50,18 +52,23 @@ class DiscordBot:
             DiscordBot._buy_webhook = discord.Webhook.from_url(
                 buy_url, adapter=discord.RequestsWebhookAdapter())
 
-            discord_listener = DiscordListener()
-            discord_listener.start()
+            DiscordListener.initialise()
+            DiscordListener.run()
+    
+    @staticmethod
+    def stop_listener():
+        DiscordListener.stop()
 
 
 class DiscordListener(threading.Thread, DiscordBot):
     """
-    Initialise the Discord bot before initialising the listener for it
+    Create only one Discord Listener
     """
     _client = None
+    _loop = None
+    _thread = None
 
-    def __init__(self):
-        super().__init__()
+    def initialise():       
         if DiscordListener._client is None:
             DiscordListener._client = discord.Client()
 
@@ -83,5 +90,16 @@ class DiscordListener(threading.Thread, DiscordBot):
         else:
             raise Exception("Must not create multiple Discord listener")
 
-    def run(self):
-        DiscordListener._client.run(DiscordBot._discord_config['bot']['token'])
+    def run():
+        if DiscordListener._loop is None:
+            DiscordListener._loop = asyncio.get_event_loop()
+            DiscordListener._loop.create_task(DiscordListener._client.start(DiscordBot._discord_config['bot']['token']))
+            DiscordListener._thread = threading.Thread(target=DiscordListener._loop.run_forever).start()
+        else: 
+            raise Exception("should not run multiple event listener loops")
+        # DiscordListener._client.run(DiscordBot._discord_config['bot']['token'])
+        
+    def stop():
+        DiscordListener._loop.stop()
+        
+        

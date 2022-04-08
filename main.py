@@ -19,3 +19,4 @@ if __name__ == "__main__":
                                 selected_stocks_config=selected_stocks_config)
     DiscordBot.initialise(discord_config)
     orchestrator.run()
+    DiscordBot.stop_listener()

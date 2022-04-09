@@ -2,11 +2,11 @@ import traceback
 
 from dataAnalysis.indicators.config import Config
 from dataAnalysis.indicators.indicator import Indicator
-from utility.discordBot.discord_bot import DiscordBot, DiscordBotChannel
-from utility.logger import Logger, LogLevel
 
 import talib
 import pandas
+
+from utility.logger import LogLevel
 
 
 class RsiConfig(Config):
@@ -23,8 +23,8 @@ _rsi_below_lower_stocks = {}
 
 
 class TickersRsi(Indicator):
-    def __init__(self, config: RsiConfig, data: pandas.DataFrame):
-        super().__init__(config, data)
+    def __init__(self, config: RsiConfig, data: pandas.DataFrame, name: str):
+        super().__init__(config, data, name)
 
     def do_analysis(self, selected_stocks: list):
         try:
@@ -32,20 +32,19 @@ class TickersRsi(Indicator):
                 # compute indicator analysis
                 data = self.data[self.config.ohlc][stock]
                 rsi_result = self.__get_result(data)
-                # Logger.log(msg=f"{stock} Rsi value={rsi_result[-1]}", log_level=LogLevel.Info)
-                msg = f"{stock}: rsi={rsi_result[-1]}"
+                msg = f"{stock}:{rsi_result[-1]}"
 
                 if rsi_result[-1] > self.config.upper:
                     if _rsi_above_upper_stocks.get(stock) is None:
-                        Logger.log(msg=msg, log_level=LogLevel.Info)
-                        DiscordBot.send_message(DiscordBotChannel.SELL, msg)
+                        self.log_message(log_msg=msg, log_level=LogLevel.Info, discord_msg=msg,
+                                         discord_channel="sell")
                         _rsi_above_upper_stocks[stock] = rsi_result[-1]
                     else:
                         _rsi_above_upper_stocks[stock] = rsi_result[-1]
                 elif rsi_result[-1] < self.config.lower:
                     if _rsi_below_lower_stocks.get(stock) is None:
-                        Logger.log(msg=msg, log_level=LogLevel.Info)
-                        DiscordBot.send_message(DiscordBotChannel.BUY, msg)
+                        self.log_message(log_msg=msg, log_level=LogLevel.Info, discord_msg=msg,
+                                         discord_channel="buy")
                         _rsi_below_lower_stocks[stock] = rsi_result[-1]
                     else:
                         _rsi_below_lower_stocks[stock] = rsi_result[-1]
@@ -55,11 +54,11 @@ class TickersRsi(Indicator):
                     elif _rsi_above_upper_stocks.get(stock) is not None:
                         _rsi_above_upper_stocks.pop(stock)
         except Exception as e:
-            Logger.log(msg=f"exception during rsi analysis: {traceback.format_exc()}", log_level=LogLevel.Critical)
-            DiscordBot.send_message(DiscordBotChannel.GENERAL, msg="exception during rsi analysis, check logs")
+            self.log_message(log_msg=f"exception during analysis: {traceback.format_exc()}",
+                             log_level=LogLevel.Error, discord_msg=f"exception during rsi analysis, {str(e)}",
+                             discord_channel="general")
+            raise
 
     def __get_result(self, col_data):
         rsi = talib.RSI(col_data, timeperiod=self.config.timeperiod)
         return rsi
-
-

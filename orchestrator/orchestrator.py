@@ -1,8 +1,10 @@
 import time
 import traceback
+
+from orchestrator.discord_routes import DiscordRoutes
 from utility.reader import read_config
 from utility.logger import Logger, LogLevel
-from utility.discordBot.discord_bot import DiscordBot, DiscordBotChannel
+from utility.discordBot.discord_messenger import DiscordMessenger
 from dataFetch.yfinance_live_data import YFinanceLiveData
 from dataAnalysis.indicators.rsi import RsiConfig, TickersRsi
 from pytz import timezone
@@ -10,14 +12,25 @@ import datetime
 
 
 class Orchestrator:
-    def __init__(self, user_config: str, indicator_config: str, selected_stocks_config: str):
+    def __init__(self, user_config: str, indicator_config: str, selected_stocks_config: str, discord_config: str):
         try:
             self.user_config_file = user_config
             self.user_config = read_config(user_config)
             self.indicator_config = read_config(indicator_config)
             self.selected_stocks_config = read_config(selected_stocks_config)
+
+            self.discord_config = read_config(discord_config)
+
+            # First initialise discord messenger with general channel
+            DiscordMessenger.initialise(self.discord_config['messenger']['webhook']['general'])
+            for name, url in self.discord_config['messenger']['webhook'].items():
+                DiscordMessenger.add_webhook(webhook_name=name, webhook_url=url)
+
+            self.discord_routes = DiscordRoutes(name="query_routes", listener_config=self.discord_config['listener'])
+
         except Exception as e:
-            Logger.log(msg=f"exception during config read: {str(e)}", log_level=LogLevel.Critical)
+            Logger.log(msg=f"exception during config read: {traceback.format_exc()}", log_level=LogLevel.Critical)
+            DiscordMessenger.send_message(channel="general", msg=f"exception during config read: {str(e)}")
 
     def run(self):
         selected_stocks = self.selected_stocks_config['to_buy'] + self.selected_stocks_config['to_sell']
@@ -43,7 +56,7 @@ class Orchestrator:
                                        ohlc=self.indicator_config['rsi']['ohlc'],
                                        upper=self.indicator_config['rsi']['upper'],
                                        lower=self.indicator_config['rsi']['lower'])
-                tickers_rsi = TickersRsi(rsi_config, data=data)
+                tickers_rsi = TickersRsi(name="Rsi", config=rsi_config, data=data)
                 tickers_rsi.do_analysis(selected_stocks=selected_stocks)
 
                 end_time = time.time()
@@ -51,13 +64,13 @@ class Orchestrator:
 
                 msg = f"starting next batch after {delay}s"
                 Logger.log(msg=msg, log_level=LogLevel.Info)
-                DiscordBot.send_message(msg=msg, channel=DiscordBotChannel.GENERAL)
+                DiscordMessenger.send_message(msg=msg, channel="general")
                 time.sleep(delay)
                 self.user_config = read_config(self.user_config_file)
 
             except Exception as e:
                 Logger.log(msg=f"exception during run: {traceback.format_exc()}", log_level=LogLevel.Critical)
-                DiscordBot.send_message(DiscordBotChannel.GENERAL, msg=f"exception during run: {str(e)}")
+                DiscordMessenger.send_message("general", msg=f"exception during run: {str(e)}")
 
     def is_nse_open(self):
         time_zone = timezone("Asia/Kolkata")
@@ -106,3 +119,12 @@ class Orchestrator:
 
         delay_minutes = get_day_delay_minutes()
         return delay_minutes
+
+    def stop(self):
+        try:
+            self.discord_routes.stop()
+            Logger.log(msg=f"Stopping {self.__name__}", log_level=LogLevel.Info)
+            DiscordMessenger.send_message(channel="general", msg=f"Stopping {self.__name__}")
+        except Exception as e:
+            Logger.log(msg=f"Exception while stopping {self.__name__} {traceback.format_exc()}", log_level=LogLevel.Info)
+            DiscordMessenger.send_message(channel="general", msg=f"Exception while stopping {self.__name__} {str(e)}")

@@ -1,5 +1,4 @@
 from orchestrator.orchestrator import Orchestrator
-from utility.discordBot.discord_bot import DiscordBot
 from utility.logger import Logger, LogLevel
 from pathlib import Path
 
@@ -16,7 +15,5 @@ if __name__ == "__main__":
     discord_config = discord_config.resolve(strict=True).as_posix()
 
     orchestrator = Orchestrator(user_config=user_config, indicator_config=indicator_config,
-                                selected_stocks_config=selected_stocks_config)
-    DiscordBot.initialise(discord_config)
+                                selected_stocks_config=selected_stocks_config, discord_config=discord_config)
     orchestrator.run()
-    DiscordBot.stop_listener()

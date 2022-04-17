@@ -71,6 +71,8 @@ class Orchestrator:
             except Exception as e:
                 Logger.log(msg=f"exception during run: {traceback.format_exc()}", log_level=LogLevel.Critical)
                 DiscordMessenger.send_message("general", msg=f"exception during run: {str(e)}")
+        Logger.log(msg=f"stopping orchestrator", log_level=LogLevel.Critical)
+        DiscordMessenger.send_message("general", msg=f"stopping orchestrator")
 
     def is_nse_open(self):
         time_zone = timezone("Asia/Kolkata")

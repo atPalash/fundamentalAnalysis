@@ -11,7 +11,7 @@ from pytz import timezone
 import datetime
 
 
-class Orchestrator:
+class Orchestrator:  
     def __init__(self, user_config: str, indicator_config: str, selected_stocks_config: str, discord_config: str):
         try:
             self.user_config_file = user_config
@@ -38,7 +38,7 @@ class Orchestrator:
 
         while not self.user_config['stop']:
             try:
-                nse_delay = self.is_nse_open()
+                nse_delay = self.wait_for_next()
                 start_time = time.time()
 
                 # DiscordBot.send_message(msg=str(start_time), channel=DiscordBotChannel.GENERAL)
@@ -62,19 +62,27 @@ class Orchestrator:
                 end_time = time.time()
                 delay = nse_delay * 60 - (end_time - start_time)
 
-                msg = f"starting next batch after {delay}s"
-                Logger.log(msg=msg, log_level=LogLevel.Info)
-                DiscordMessenger.send_message(msg=msg, channel="general")
-                time.sleep(delay)
-                self.user_config = read_config(self.user_config_file)
+                # if delay is more than 12hrs, stop this instance and cron will run another instance tomorrow
+                if delay >= 12*60*60:
+                    msg = f"stopping with this batch, next batch will be starting tomorrow"
+                    Logger.log(msg=msg, log_level=LogLevel.Info)
+                    DiscordMessenger.send_message(msg=msg, channel="general")
+                    self.stop()
+                    break
+                else:
+                    msg = f"starting next batch after {delay}s"
+                    Logger.log(msg=msg, log_level=LogLevel.Info)
+                    DiscordMessenger.send_message(msg=msg, channel="general")
+                    time.sleep(delay)
+                    self.user_config = read_config(self.user_config_file)
 
             except Exception as e:
                 Logger.log(msg=f"exception during run: {traceback.format_exc()}", log_level=LogLevel.Critical)
                 DiscordMessenger.send_message("general", msg=f"exception during run: {str(e)}")
-        Logger.log(msg=f"stopping orchestrator", log_level=LogLevel.Critical)
-        DiscordMessenger.send_message("general", msg=f"stopping orchestrator")
+        Logger.log(msg=f"Stopping orchestrator loop", log_level=LogLevel.Critical)
+        DiscordMessenger.send_message("general", msg=f"Stopping orchestrator loop")
 
-    def is_nse_open(self):
+    def wait_for_next(self):
         time_zone = timezone("Asia/Kolkata")
         ind_time = datetime.datetime.now(timezone("Asia/Kolkata"))
 
@@ -99,7 +107,7 @@ class Orchestrator:
                 monday_open_time = today_open_time + datetime.timedelta(hours=24 * 2)
                 delay_mins = (monday_open_time - ind_time).total_seconds() / 60
             # Sunday
-            elif day_of_week == 0:
+            elif day_of_week == 7:
                 monday_open_time = today_open_time + datetime.timedelta(hours=24)
                 delay_mins = (monday_open_time - ind_time).total_seconds() / 60
             else:
@@ -125,8 +133,8 @@ class Orchestrator:
     def stop(self):
         try:
             self.discord_routes.stop()
-            Logger.log(msg=f"Stopping {self.__name__}", log_level=LogLevel.Info)
-            DiscordMessenger.send_message(channel="general", msg=f"Stopping {self.__name__}")
+            Logger.log(msg=f"Stopping Orchestrator", log_level=LogLevel.Info)
+            DiscordMessenger.send_message(channel="general", msg=f"Stopping Orchestrator")
         except Exception as e:
-            Logger.log(msg=f"Exception while stopping {self.__name__} {traceback.format_exc()}", log_level=LogLevel.Info)
-            DiscordMessenger.send_message(channel="general", msg=f"Exception while stopping {self.__name__} {str(e)}")
+            Logger.log(msg=f"Exception while stopping Orchestrator {traceback.format_exc()}", log_level=LogLevel.Info)
+            DiscordMessenger.send_message(channel="general", msg=f"Exception while stopping Orchestrator {str(e)}")

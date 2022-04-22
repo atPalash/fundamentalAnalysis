@@ -1,3 +1,4 @@
+from pathlib import Path
 import pandas
 
 
@@ -8,11 +9,19 @@ def convert_pandas_types(df, folder):
         else:
             df[col] = df[col].astype(float)
 
-    df.to_excel("../database/fundamentals/" + folder + "/" + k + ".xlsx", index=False)
+    df.to_excel(folder + "/" + k + ".xlsx", index=False)
 
 
 if __name__ == "__main__":
-    nseStocks = pandas.read_csv("../../database/fundamentals/stock_information.csv").fillna(0)
+    database_folder = Path("stockFundamentals") / "database"
+    ch = database_folder.resolve().as_posix()
+    
+    # TODO check if better option available
+    stock_fundamentals_csv = ""
+    for file in database_folder.glob("*.csv"):
+        stock_fundamentals_csv = file
+
+    nseStocks = pandas.read_csv(stock_fundamentals_csv).fillna(0)
     selected_cols = ["shortName", "sector", "industry", "longBusinessSummary", "bookValue", "currentPrice", "currentRatio",
                      "debtToEquity", "earningsGrowth", "ebitda", "ebitdaMargins", "enterpriseToEbitda", "enterpriseToRevenue",
                      "enterpriseValue", "floatShares", "grossMargins", "grossProfits", "heldPercentInsiders",
@@ -44,10 +53,10 @@ if __name__ == "__main__":
             industry_wise_stocks[industry] = industry_wise_stocks[industry].append(selected_entry_df)
 
     for k, v in sector_wise_stocks.items():
-        convert_pandas_types(v, "sectors")
+        convert_pandas_types(v, database_folder.resolve().as_posix())
 
     for k, v in industry_wise_stocks.items():
-        convert_pandas_types(v, "industries")
+        convert_pandas_types(v, database_folder.resolve().as_posix())
 
 # Template codes'
 # print(nseStocks.shape)

@@ -4,7 +4,7 @@ from inspect import getframeinfo, stack
 from urllib3 import connectionpool
 from discord import client, webhook
 from pathlib import Path
-
+from datetime import datetime
 
 class LogLevel(Enum):
     Debug = 1
@@ -21,7 +21,13 @@ class Logger:
     def __initialise():
         if Logger._logger is None:
             log_folder = Path("logs")
-            all_log = log_folder / "all.log"
+            logfile = datetime.now().strftime('%H_%M_%d_%m_%Y.log')
+            all_log = log_folder / logfile
+            
+            # create a log file if not exist
+            file_handler = logging.FileHandler(all_log, mode="w", encoding=None, delay=False)
+            file_handler.close()
+            
             all_log = all_log.resolve(strict=True).as_posix()
             logging.basicConfig(filename=all_log,
                                 format='%(asctime)s-%(levelname)s-%(message)s',

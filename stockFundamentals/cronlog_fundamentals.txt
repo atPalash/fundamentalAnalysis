@@ -10,9 +10,3 @@ Terminated
 /home/pi/Dev/fundamentalAnalysis
 /home/pi/Dev/fundamentalAnalysis
 /home/pi/Dev/fundamentalAnalysis
-cp: cannot stat '/home/pi/Dev/fundamentalAnalysis/logs/*.log': No such file or directory
-start analysis
-start analysis
-start analysis
-start analysis
-start analysis

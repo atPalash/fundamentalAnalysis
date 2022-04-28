@@ -15,3 +15,8 @@ stop: False
 nse:
   open: "9:15"
   close: "15:30"
+
+# google news
+google_news:
+  past_days: 10
+  max_news_count: 10

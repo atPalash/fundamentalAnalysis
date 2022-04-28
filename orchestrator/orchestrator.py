@@ -26,7 +26,8 @@ class Orchestrator:
             for name, url in self.discord_config['messenger']['webhook'].items():
                 DiscordMessenger.add_webhook(webhook_name=name, webhook_url=url)
 
-            self.discord_routes = DiscordRoutes(name="query_routes", listener_config=self.discord_config['listener'])
+            self.discord_routes = DiscordRoutes(name="query_routes", listener_config=self.discord_config['listener'],
+                                                user_config=self.user_config)
 
         except Exception as e:
             Logger.log(msg=f"exception during config read: {traceback.format_exc()}", log_level=LogLevel.Critical)

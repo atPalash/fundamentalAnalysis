@@ -3,6 +3,12 @@ import discord
 from stockNews.google_news_handler import GoogleNewsHandler
 
 EMBEDDED_MSG_SIZE = 2096
+user_config = {}
+
+
+def set_configs(config: dict):
+    global user_config
+    user_config = config
 
 
 def commands(*args):
@@ -40,15 +46,16 @@ def headlines(*args):
             ticker = str(user_args[0])
             days = int(user_args[1])
             count = int(user_args[2])
-            headlines = GoogleNewsHandler.get_headlines(ticker=ticker, past_days=days, max_news_count=count)
+            head_lines = GoogleNewsHandler.get_headlines(ticker=ticker, past_days=days, max_news_count=count)
 
         elif arg_count >= 1:
             ticker = str(user_args[0])
-            headlines = GoogleNewsHandler.get_headlines(ticker=ticker)
+            head_lines = GoogleNewsHandler.get_headlines(ticker=ticker, past_days=user_config['google_news']['past_days'],
+                                                         max_news_count=user_config['google_news']['max_news_count'])
         else:
             raise Exception("ticker not defined")
 
-        for index, row in headlines.iterrows():
+        for index, row in head_lines.iterrows():
             res += f"[{index}. {row['title']}](https://{row['link']}) \n "
 
         return __convert_to_chunks("headlines", res)

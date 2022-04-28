@@ -1,11 +1,12 @@
 from utility.discordBot.discord_listener import DiscordListener
-from orchestrator.route_methods import route_methods
+import orchestrator.route_methods as route
 
 
 class DiscordRoutes:
-    def __init__(self, name: str, listener_config: dict):
+    def __init__(self, name: str, listener_config: dict, user_config: dict):
         self.name = name
-        self.route_methods = route_methods
+        self.route_methods = route.route_methods
+        route.set_configs(user_config)
         # listener only available for query channel
         DiscordListener.initialise(channel_name="query", token=listener_config['bot']['token'])
         self.__add_route()

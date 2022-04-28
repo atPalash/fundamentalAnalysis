@@ -55,8 +55,10 @@ def headlines(*args):
         else:
             raise Exception("ticker not defined")
 
-        for index, row in head_lines.iterrows():
-            res += f"[{index}. {row['title']}](https://{row['link']}) \n "
+        news_count = 0
+        for news in head_lines:
+            news_count += 1
+            res += f"[{news_count}. {news.title}]({news.link}) \n "
 
         return __convert_to_chunks("headlines", res)
     except Exception as e:
@@ -84,7 +86,7 @@ def __convert_to_chunks(title: str, msg: str):
                 embeds.append(embed)
                 des = ""
 
-        if des != "":
+        if len(des) > 3:
             embed = __create_embed(title=title, msg=des)
             embeds.append(embed)
 

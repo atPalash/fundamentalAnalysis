@@ -1,37 +1,60 @@
-import pandas as pd
-from newspaper import Config
-from GoogleNews import GoogleNews
+# import pandas as pd
+# from newspaper import Config
+# from GoogleNews import GoogleNews
+import datetime
+from dataclasses import dataclass
+
+from pygooglenews import GoogleNews
+from yfinance.ticker import TickerBase
+
+
+@dataclass
+class News:
+    title: str
+    link: str
 
 
 class GoogleNewsHandler:
     _googlenews = None
+    # _yfinancenews = None
     _ticker_news_map = {}
-    _config = None
+
+    # _config = None
 
     @staticmethod
     def __initialise():
         if GoogleNewsHandler._googlenews is None:
-            GoogleNewsHandler._googlenews = GoogleNews()
-            GoogleNewsHandler._config = Config()
+            GoogleNewsHandler._googlenews = GoogleNews(country='IN')
 
-            user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0'
-            GoogleNewsHandler._config.browser_user_agent = user_agent
-            GoogleNewsHandler._config.request_timeout = 20
-        GoogleNewsHandler._googlenews.clear()
+            # GoogleNewsHandler._yfinancenews = yfinance.ticker.TickerBase.get_news()
+            # GoogleNewsHandler._config = Config()
+
+            # user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0'
+            # GoogleNewsHandler._config.browser_user_agent = user_agent
+            # GoogleNewsHandler._config.request_timeout = 20
+        # GoogleNewsHandler._googlenews.clear()
         return GoogleNewsHandler._googlenews
 
     @staticmethod
     def get_headlines(ticker=None, past_days=30, max_news_count=50):
         googlenews = GoogleNewsHandler.__initialise()
-        googlenews.set_period(f"{past_days}d")
+        to_date = datetime.datetime.now()
+        from_date = to_date - datetime.timedelta(days=past_days)
+        date_format = "%Y-%m-%d"
+        # googlenews.set_period(f"{past_days}d")
 
         if GoogleNewsHandler._ticker_news_map.get(ticker) is None:
+            gn = googlenews.search(query=f"intitle:{ticker}", from_=from_date.strftime(date_format), to_=to_date.strftime(date_format))
+            ticker_news = []
+            for news in gn['entries']:
+                ticker_news.append(News(news['title'], news['link']))
 
-            googlenews.get_news(f"{ticker}")
-            result = googlenews.results()
-            # store the results
-            df = pd.DataFrame(result)
-            GoogleNewsHandler._ticker_news_map[ticker] = df
+            # googlenews.get_news(f"{ticker}")
+            # googlenews.search(f"{ticker}")
+            # result = googlenews.results()
+            # # store the results
+            # df = pd.DataFrame(result)
+            GoogleNewsHandler._ticker_news_map[ticker] = ticker_news
 
         return GoogleNewsHandler._ticker_news_map[ticker][:max_news_count]
 
@@ -59,8 +82,6 @@ if __name__ == "__main__":
     headlines = GoogleNewsHandler.get_headlines(ticker="ADANI GREEN", past_days=30, max_news_count=10)
     articles = GoogleNewsHandler.get_article(ticker="ADANI GREEN")
     print("done")
-
-
 
 '''
 import pandas as pd

@@ -50,7 +50,8 @@ def headlines(*args):
 
         elif arg_count >= 1:
             ticker = str(user_args[0])
-            head_lines = GoogleNewsHandler.get_headlines(ticker=ticker, past_days=user_config['google_news']['past_days'],
+            head_lines = GoogleNewsHandler.get_headlines(ticker=ticker,
+                                                         past_days=user_config['google_news']['past_days'],
                                                          max_news_count=user_config['google_news']['max_news_count'])
         else:
             raise Exception("ticker not defined")
@@ -86,7 +87,7 @@ def __convert_to_chunks(title: str, msg: str):
                 embeds.append(embed)
                 des = ""
 
-        if len(des) > 3:
+        if len(des) > 3:  # ensure there is message
             embed = __create_embed(title=title, msg=des)
             embeds.append(embed)
 

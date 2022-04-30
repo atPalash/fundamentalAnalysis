@@ -1,6 +1,10 @@
 import datetime
 from dataclasses import dataclass
 from pygooglenews import GoogleNews
+from newspaper import Article
+from newspaper import Config
+import nltk
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 
 @dataclass
@@ -12,11 +16,20 @@ class News:
 class GoogleNewsHandler:
     _googlenews = None
     _ticker_news_map = {}
+    _config = None
 
     @staticmethod
     def __initialise():
         if GoogleNewsHandler._googlenews is None:
             GoogleNewsHandler._googlenews = GoogleNews(country='IN')
+
+            nltk.download('vader_lexicon')  # required for Sentiment Analysis
+            nltk.download('punkt')
+            user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0'
+            config = Config()
+            config.browser_user_agent = user_agent
+            config.request_timeout = 20
+
         return GoogleNewsHandler._googlenews
 
     @staticmethod
@@ -34,10 +47,12 @@ class GoogleNewsHandler:
 
             GoogleNewsHandler._ticker_news_map[ticker] = ticker_news
 
-        return GoogleNewsHandler._ticker_news_map[ticker][:max_news_count]
+        news_list_len = len(GoogleNewsHandler._ticker_news_map[ticker])
+        news_count = max_news_count if news_list_len > max_news_count else news_list_len
+        return GoogleNewsHandler._ticker_news_map[ticker][:news_count]
 
     @staticmethod
-    def get_article(ticker=None, index=0):
+    def get_sentiment(ticker=None, max_news_count=10):
         """
         Defaults to past_days and max_news_count as defined by the user while getting headlines. User should send the
         index of the news article to get from list of headlines.
@@ -45,9 +60,49 @@ class GoogleNewsHandler:
         if GoogleNewsHandler._ticker_news_map.get(ticker) is None:
             GoogleNewsHandler.get_headlines(ticker=ticker)
 
-        df = GoogleNewsHandler._ticker_news_map[ticker]
-        gnews_link = df['link'][index]
-        return f"https://{gnews_link}"
+        news_list_len = len(GoogleNewsHandler._ticker_news_map[ticker])
+        news_count = max_news_count if news_list_len > max_news_count else news_list_len
+        news_list = GoogleNewsHandler._ticker_news_map[ticker][:news_count]
+        positive_sentiment = 0
+        negative_sentiment = 0
+        neutral_sentiment = 0
+        for news in news_list:
+            article = Article(news.link, config=GoogleNewsHandler._config) #providing the link
+            try:
+                article.download()  # downloading the article
+                article.parse()  # parsing the article
+                article.nlp()  # performing natural language processing (nlp)
+                negative, neutral, positive = GoogleNewsHandler.__compute_sentiment_bin(article=article)
+                negative_sentiment += negative
+                neutral_sentiment += neutral
+                positive_sentiment += positive
+            except Exception as e:
+                pass
+
+        sentiment = f"positive:{positive_sentiment}, negative: {negative_sentiment}, neutral: {neutral_sentiment}"
+        return sentiment
+
+    @staticmethod
+    def __compute_sentiment_bin(article: Article):
+        # Assigning Initial Values
+        positive = 0
+        negative = 0
+        neutral = 0
+
+        analyzer = SentimentIntensityAnalyzer().polarity_scores(article.meta_description)
+        neg = analyzer['neg']
+        neu = analyzer['neu']
+        pos = analyzer['pos']
+        comp = analyzer['compound']
+
+        if neg > pos:
+            negative += 1  # increasing the count by 1
+        elif pos > neg:
+            positive += 1  # increasing the count by 1
+        elif pos == neg:
+            neutral += 1  # increasing the count by 1
+
+        return negative, neutral, positive
 
 
 if __name__ == "__main__":

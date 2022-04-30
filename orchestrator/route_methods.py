@@ -1,4 +1,5 @@
 import discord
+from typing import List
 
 from stockNews.google_news_handler import GoogleNewsHandler
 
@@ -25,8 +26,9 @@ def commands(*args):
         for method, func in route_methods.items():
             res += f"{method}:{func.__doc__}\n"
     else:
-        if route_methods.get(args[0]) is not None:
-            res = route_methods[args[0]].__doc__
+        method = route_methods.get(args[0])
+        if method is not None:
+            res = f"{method.__name__}\n{method.__doc__}"
         else:
             res = "This method is not available, check all methods available commands: all"
     return __convert_to_chunks('commands', res)
@@ -37,9 +39,26 @@ def headlines(*args):
     Send default number of news headlines when only ticker is passed as argument. For news count and days user must
     define both. Also raise error on calling without ticker or valid ticker. User can click on the links to check the
     detailed article.
+
+    Parameters
+    ----------
+    args :
+        ticker: string, mandatory
+            User sends one ticker.
+        days: past number of days to search for news
+        count: number of news result to show
+
+    Returns
+    ---------
+        discord embedded message with description set to clickable headlines to detailed articles
+
+    Example
+    ---------
+    headlines: adani,10,30 -> shows 30 result from last 10 days
+    headlines: adani -> shows result from last default days and count
     """
     try:
-        user_args = args[0].split(",")
+        user_args = __clean_user_args(args[0].split(","))
         arg_count = len(user_args)
         res = ""
         if arg_count == 3:
@@ -64,6 +83,37 @@ def headlines(*args):
         return __convert_to_chunks("headlines", res)
     except Exception as e:
         raise
+
+
+def sentiment(*args):
+    """
+    Judge sentiment for the stock ticker provided.
+
+    Parameters
+    ----------
+    args : list[string], mandatory
+        User sends ticker name/names as a list separated by ","
+
+    Returns
+    ---------
+        discord embedded message with description set to sentiment
+
+    Example
+    ---------
+    sentiment: adani,tcs,10 -> get sentiment of adani, tcs from last 10 news result
+    sentiment: adani -> get sentiment of adani default news count
+    """
+    tickers = __clean_user_args(args[0].split(","))
+    max_news_count = user_config['google_news']['max_news_count']
+    if tickers[-1].isdigit():
+        max_news_count = int(tickers[-1])
+        tickers.pop()
+
+    ticker_sentiments = ""
+    for ticker in tickers:
+        senti = GoogleNewsHandler.get_sentiment(ticker=ticker, max_news_count=max_news_count)
+        ticker_sentiments += f"{ticker}: {senti}\n"
+    return __convert_to_chunks("sentiment", ticker_sentiments)
 
 
 def __convert_to_chunks(title: str, msg: str):
@@ -101,4 +151,9 @@ def __create_embed(title: str, msg: str):
     return embed
 
 
-route_methods = dict(commands=commands, headlines=headlines)
+def __clean_user_args(data: List[str]):
+    ret = [x.strip() for x in data]
+    return ret
+
+
+route_methods = dict(commands=commands, headlines=headlines, sentiment=sentiment)

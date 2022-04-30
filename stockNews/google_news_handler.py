@@ -37,7 +37,7 @@ class GoogleNewsHandler:
         googlenews = GoogleNewsHandler.__initialise()
         
         if GoogleNewsHandler._ticker_news_map.get(ticker) is None:
-            gn = googlenews.search(query=f"intitle:{ticker}", when=f"{past_days}d")
+            gn = googlenews.search(query=f"allintitle:{ticker}", when=f"{past_days}d")
             ticker_news = []
             for news in gn['entries']:
                 ticker_news.append(News(news['title'], news['link']))

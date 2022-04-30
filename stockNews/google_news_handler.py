@@ -35,12 +35,9 @@ class GoogleNewsHandler:
     @staticmethod
     def get_headlines(ticker=None, past_days=30, max_news_count=50):
         googlenews = GoogleNewsHandler.__initialise()
-        to_date = datetime.datetime.now()
-        from_date = to_date - datetime.timedelta(days=past_days)
-        date_format = "%Y-%m-%d"
-
+        
         if GoogleNewsHandler._ticker_news_map.get(ticker) is None:
-            gn = googlenews.search(query=f"intitle:{ticker}", from_=from_date.strftime(date_format), to_=to_date.strftime(date_format))
+            gn = googlenews.search(query=f"intitle:{ticker}", when=f"{past_days}d")
             ticker_news = []
             for news in gn['entries']:
                 ticker_news.append(News(news['title'], news['link']))
@@ -113,7 +110,7 @@ if __name__ == "__main__":
                      "BAJFINANCE": "BAJAJ FINANCE"}
 
     headlines = GoogleNewsHandler.get_headlines(ticker="ADANI GREEN", past_days=30, max_news_count=10)
-    articles = GoogleNewsHandler.get_article(ticker="ADANI GREEN")
+    articles = GoogleNewsHandler.get_sentiment(ticker="ADANI GREEN")
     print("done")
 
 '''

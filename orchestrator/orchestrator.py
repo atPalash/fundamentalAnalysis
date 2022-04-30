@@ -64,7 +64,7 @@ class Orchestrator:
                 delay = nse_delay * 60 - (end_time - start_time)
 
                 # if delay is more than 12hrs, stop this instance and cron will run another instance tomorrow
-                if delay >= 12*60*60:
+                if delay >= 12*60*60 and not self.user_config['debugging']:
                     msg = f"stopping with this batch, next batch will be starting tomorrow"
                     Logger.log(msg=msg, log_level=LogLevel.Info)
                     DiscordMessenger.send_message(msg=msg, channel="general")

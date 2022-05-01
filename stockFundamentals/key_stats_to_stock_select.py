@@ -1,5 +1,9 @@
+from datetime import datetime
+import os
 from pathlib import Path
 import pandas
+import shutil
+import yahoo_key_stats_download
 
 
 def convert_pandas_types(df, folder):
@@ -13,15 +17,27 @@ def convert_pandas_types(df, folder):
 
 
 if __name__ == "__main__":
-    database_folder = Path("stockFundamentals") / "database"
-    ch = database_folder.resolve().as_posix()
+    date_time = datetime.now().strftime('%H_%M_%d_%m_%Y')
+    current_working_directory = Path("stockFundamentals")
+    database_folder = current_working_directory / "database"
+    previous_database_folder = database_folder / "previous"
     
-    # TODO check if better option available
-    stock_fundamentals_csv = ""
-    for file in database_folder.glob("*.csv"):
-        stock_fundamentals_csv = file
+    database_folder_path = database_folder.resolve(strict=True).as_posix()
+    previous_database_path = previous_database_folder.resolve(strict=True).as_posix()
+    
+    # move previous fundamentals
+    for file in os.listdir(database_folder_path):
+        if not file.endswith('previous'):
+            shutil.move(os.path.join(database_folder_path, file), os.path.join(previous_database_path, file))
+         
+    # Download latest fundamentals, this creates a csv file of fundamental data of all Nse stocks.
+    latest_fundamentals_folder = os.path.join(database_folder_path, date_time)
+    csv_name = "stock_fundamentals.csv"
+    os.makedirs(latest_fundamentals_folder)
+    stock_fundamentals_csv_path = os.path.join(latest_fundamentals_folder, csv_name) 
+    yahoo_key_stats_download.download_latest_fundamentals(stock_csv_path=stock_fundamentals_csv_path, debug=False)
 
-    nseStocks = pandas.read_csv(stock_fundamentals_csv).fillna(0)
+    nseStocks = pandas.read_csv(stock_fundamentals_csv_path).fillna(0)
     selected_cols = ["shortName", "sector", "industry", "longBusinessSummary", "bookValue", "currentPrice", "currentRatio",
                      "debtToEquity", "earningsGrowth", "ebitda", "ebitdaMargins", "enterpriseToEbitda", "enterpriseToRevenue",
                      "enterpriseValue", "floatShares", "grossMargins", "grossProfits", "heldPercentInsiders",
@@ -53,10 +69,10 @@ if __name__ == "__main__":
             industry_wise_stocks[industry] = industry_wise_stocks[industry].append(selected_entry_df)
 
     for k, v in sector_wise_stocks.items():
-        convert_pandas_types(v, database_folder.resolve().as_posix())
+        convert_pandas_types(v, latest_fundamentals_folder)
 
     for k, v in industry_wise_stocks.items():
-        convert_pandas_types(v, database_folder.resolve().as_posix())
+        convert_pandas_types(v, latest_fundamentals_folder)
 
 # Template codes'
 # print(nseStocks.shape)

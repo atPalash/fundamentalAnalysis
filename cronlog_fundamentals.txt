@@ -1,0 +1,19 @@
+/home/pi/Dev/fundamentalAnalysis
+/home/pi/Dev/fundamentalAnalysis
+/home/pi/Dev/fundamentalAnalysis
+/home/pi/Dev/fundamentalAnalysis
+/home/pi/Dev/fundamentalAnalysis
+/home/pi/Dev/fundamentalAnalysis
+Terminated
+/home/pi/Dev/fundamentalAnalysis
+Terminated
+/home/pi/Dev/fundamentalAnalysis
+/home/pi/Dev/fundamentalAnalysis
+/home/pi/Dev/fundamentalAnalysis
+/home/pi downloading fundamentals and converting to excel
+/home/pi/Dev/fundamentalAnalysis/stockFundamentals/cron_fundamentals.sh: 6: /home/pi/Dev/fundamentalAnalysis/stockFundamentals/cron_fundamentals.sh: /home/pi/.venv/bin/python: not found
+/home/pi/Dev/fundamentalAnalysis/stockFundamentals downloading fundamentals and converting to excel
+/home/pi/Dev/fundamentalAnalysis/stockFundamentals/cron_fundamentals.sh: 6: /home/pi/Dev/fundamentalAnalysis/stockFundamentals/cron_fundamentals.sh: /home/pi/Dev/fundamentalAnalysis/stockFundamentals/.venv/bin/python: not found
+/home/pi/Dev/fundamentalAnalysis downloading fundamentals and converting to excel
+(3, 153)
+Elapsed  37.74286937713623

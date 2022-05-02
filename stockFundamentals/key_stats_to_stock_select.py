@@ -5,6 +5,14 @@ import pandas
 import shutil
 import yahoo_key_stats_download
 
+def check_folder_path(folder_path:str):
+    """
+    checks for existence of folder at path. if not present creates one.
+    Args:
+        folder_path (str): folder path to check or create.
+    """
+    if not os.path.isdir(folder_path):
+        os.mkdir(folder_path)
 
 def convert_pandas_types(df, folder):
     for col in df:
@@ -12,7 +20,8 @@ def convert_pandas_types(df, folder):
             df[col] = df[col].astype(str)
         else:
             df[col] = df[col].astype(float)
-
+            
+    check_folder_path(folder)
     df.to_excel(folder + "/" + k + ".xlsx", index=False)
 
 
@@ -61,7 +70,7 @@ if __name__ == "__main__":
         industry = entry['industry']
         selected_entry = entry[selected_cols]
         selected_entry_df = pandas.DataFrame(selected_entry).transpose()
-
+        selected_entry_df["ROA + PE"] = selected_entry_df["trailingPE"] + selected_entry_df["returnOnAssets"]
         if sector != 0:
             sector_wise_stocks[sector] = sector_wise_stocks[sector].append(selected_entry_df)
 
@@ -69,10 +78,10 @@ if __name__ == "__main__":
             industry_wise_stocks[industry] = industry_wise_stocks[industry].append(selected_entry_df)
 
     for k, v in sector_wise_stocks.items():
-        convert_pandas_types(v, latest_fundamentals_folder)
+        convert_pandas_types(v, f"{latest_fundamentals_folder}/sector")
 
     for k, v in industry_wise_stocks.items():
-        convert_pandas_types(v, latest_fundamentals_folder)
+        convert_pandas_types(v, f"{latest_fundamentals_folder}/industry")
 
 # Template codes'
 # print(nseStocks.shape)

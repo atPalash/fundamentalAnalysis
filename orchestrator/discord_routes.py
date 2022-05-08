@@ -8,7 +8,7 @@ class DiscordRoutes:
         self.route_methods = route.route_methods
         route.set_configs(user_config)
         # listener only available for query channel
-        DiscordListener.initialise(channel_name="query", token=listener_config['bot']['token'])
+        DiscordListener.initialise(listener_config=listener_config)
         self.__add_route()
         DiscordListener.run()
 

@@ -36,15 +36,11 @@ class TickersRsi(Indicator):
 
                 if rsi_result[-1] > self.config.upper:
                     if _rsi_above_upper_stocks.get(stock) is None:
-                        self.log_message(log_msg=msg, log_level=LogLevel.Info, discord_msg=msg,
-                                         discord_channel="sell")
                         _rsi_above_upper_stocks[stock] = rsi_result[-1]
                     else:
                         _rsi_above_upper_stocks[stock] = rsi_result[-1]
                 elif rsi_result[-1] < self.config.lower:
                     if _rsi_below_lower_stocks.get(stock) is None:
-                        self.log_message(log_msg=msg, log_level=LogLevel.Info, discord_msg=msg,
-                                         discord_channel="buy")
                         _rsi_below_lower_stocks[stock] = rsi_result[-1]
                     else:
                         _rsi_below_lower_stocks[stock] = rsi_result[-1]
@@ -53,6 +49,19 @@ class TickersRsi(Indicator):
                         _rsi_below_lower_stocks.pop(stock)
                     elif _rsi_above_upper_stocks.get(stock) is not None:
                         _rsi_above_upper_stocks.pop(stock)
+
+            # combine all the results and send to discord/log at once
+            rsi_upper = ""
+            for k, v in _rsi_above_upper_stocks.items():
+                rsi_upper += f"{k}: {v}\n"
+            rsi_lower = ""
+            for k, v in _rsi_below_lower_stocks.items():
+                rsi_lower += f"{k}: {v}\n"
+
+            self.log_message(log_msg=f"{self.name} buy---------------------\n" + rsi_upper, log_level=LogLevel.Info,
+                             discord_msg=rsi_upper, discord_channel="sell")
+            self.log_message(log_msg=f"{self.name} sell--------------------\n" + rsi_lower, log_level=LogLevel.Info,
+                             discord_msg=rsi_lower, discord_channel="buy")
         except Exception as e:
             self.log_message(log_msg=f"exception during analysis: {traceback.format_exc()}",
                              log_level=LogLevel.Error, discord_msg=f"exception during rsi analysis, {str(e)}",

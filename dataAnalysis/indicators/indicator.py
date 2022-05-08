@@ -27,5 +27,5 @@ class Indicator:
         """
         Log results and exceptions in indicator
         """
-        Logger.log(msg=self.name + ":" + log_msg, log_level=log_level)
-        DiscordMessenger.send_message(channel=discord_channel, msg=self.name + ":" + discord_msg)
+        Logger.log(msg=log_msg, log_level=log_level)
+        DiscordMessenger.send_message(channel=discord_channel, msg=discord_msg, title=self.name)

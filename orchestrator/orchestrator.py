@@ -22,16 +22,14 @@ class Orchestrator:
             self.discord_config = read_config(discord_config)
 
             # First initialise discord messenger with general channel
-            DiscordMessenger.initialise(self.discord_config['messenger']['webhook']['general'])
-            for name, url in self.discord_config['messenger']['webhook'].items():
-                DiscordMessenger.add_webhook(webhook_name=name, webhook_url=url)
-
+            DiscordMessenger.initialise(self.discord_config['messenger']['webhook'])
             self.discord_routes = DiscordRoutes(name="query_routes", listener_config=self.discord_config['listener'],
                                                 user_config=self.user_config)
 
         except Exception as e:
             Logger.log(msg=f"exception during config read: {traceback.format_exc()}", log_level=LogLevel.Critical)
-            DiscordMessenger.send_message(channel="general", msg=f"exception during config read: {str(e)}")
+            DiscordMessenger.send_message(channel="general", msg=f"exception during config read: {str(e)}",
+                                          title=f"{type(e).__name__}")
 
     def run(self):
         selected_stocks = self.selected_stocks_config['to_buy'] + self.selected_stocks_config['to_sell']
@@ -67,21 +65,22 @@ class Orchestrator:
                 if delay >= 12*60*60 and not self.user_config['debugging']:
                     msg = f"stopping with this batch, next batch will be starting tomorrow"
                     Logger.log(msg=msg, log_level=LogLevel.Info)
-                    DiscordMessenger.send_message(msg=msg, channel="general")
+                    DiscordMessenger.send_message(msg=msg, channel="general", title="stop")
                     self.stop()
                     break
                 else:
                     msg = f"starting next batch after {delay}s"
                     Logger.log(msg=msg, log_level=LogLevel.Info)
-                    DiscordMessenger.send_message(msg=msg, channel="general")
+                    DiscordMessenger.send_message(msg=msg, channel="general", title="next batch")
                     time.sleep(delay)
                     self.user_config = read_config(self.user_config_file)
 
             except Exception as e:
                 Logger.log(msg=f"exception during run: {traceback.format_exc()}", log_level=LogLevel.Critical)
-                DiscordMessenger.send_message("general", msg=f"exception during run: {str(e)}")
-        Logger.log(msg=f"Stopping orchestrator loop", log_level=LogLevel.Critical)
-        DiscordMessenger.send_message("general", msg=f"Stopping orchestrator loop")
+                DiscordMessenger.send_message("general", msg=f"exception during run: {str(e)}",
+                                              title=f"{type(e).__name__}")
+        # Logger.log(msg=f"Stopping orchestrator loop", log_level=LogLevel.Critical)
+        # DiscordMessenger.send_message("general", msg=f"Stopping orchestrator loop")
 
     def wait_for_next(self):
         time_zone = timezone("Asia/Kolkata")
@@ -135,7 +134,8 @@ class Orchestrator:
         try:
             self.discord_routes.stop()
             Logger.log(msg=f"Stopping Orchestrator", log_level=LogLevel.Info)
-            DiscordMessenger.send_message(channel="general", msg=f"Stopping Orchestrator")
+            DiscordMessenger.send_message(channel="general", msg=f"Stopping Orchestrator", title="stop orchestrator")
         except Exception as e:
             Logger.log(msg=f"Exception while stopping Orchestrator {traceback.format_exc()}", log_level=LogLevel.Info)
-            DiscordMessenger.send_message(channel="general", msg=f"Exception while stopping Orchestrator {str(e)}")
+            DiscordMessenger.send_message(channel="general", msg=f"Exception while stopping Orchestrator {str(e)}",
+                                          title=f"{type(e).__name__}")

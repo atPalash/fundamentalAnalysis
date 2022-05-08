@@ -31,7 +31,7 @@ def commands(*args):
             res = f"{method.__name__}\n{method.__doc__}"
         else:
             res = "This method is not available, check all methods available commands: all"
-    return __convert_to_chunks('commands', res)
+    return res
 
 
 def headlines(*args):
@@ -80,7 +80,7 @@ def headlines(*args):
             news_count += 1
             res += f"[{news_count}. {news.title}]({news.link}) \n "
 
-        return __convert_to_chunks("headlines", res)
+        return res
     except Exception as e:
         raise
 
@@ -100,55 +100,53 @@ def sentiment(*args):
 
     Example
     ---------
-    sentiment: adani,tcs,10 -> get sentiment of adani, tcs from last 10 news result
+    sentiment: adani,tcs -> get sentiment of adani, tcs from last headlines news collected by calling headlines.
     sentiment: adani -> get sentiment of adani default news count
     """
     tickers = __clean_user_args(args[0].split(","))
-    max_news_count = user_config['google_news']['max_news_count']
     if tickers[-1].isdigit():
-        max_news_count = int(tickers[-1])
         tickers.pop()
 
     ticker_sentiments = ""
     for ticker in tickers:
-        senti = GoogleNewsHandler.get_sentiment(ticker=ticker, max_news_count=max_news_count)
+        senti = GoogleNewsHandler.get_sentiment(ticker=ticker)
         ticker_sentiments += f"{ticker}: {senti}\n"
-    return __convert_to_chunks("sentiment", ticker_sentiments)
+    return ticker_sentiments
 
 
-def __convert_to_chunks(title: str, msg: str):
-    """
-    Converts the message sent in chunks for proper discord message send.
-    """
-    embeds = []
-
-    if len(msg) < EMBEDDED_MSG_SIZE:
-        embed = __create_embed(title=title, msg=msg)
-        embeds.append(embed)
-    else:
-        msgs = msg.split('\n')
-
-        des = ""
-        for message in msgs:
-            if len(des) < EMBEDDED_MSG_SIZE:
-                des += message + '\n'
-            else:
-                embed = __create_embed(title=title, msg=des)
-                embeds.append(embed)
-                des = ""
-
-        if len(des) > 3:  # ensure there is message
-            embed = __create_embed(title=title, msg=des)
-            embeds.append(embed)
-
-    return embeds
-
-
-def __create_embed(title: str, msg: str):
-    embed = discord.Embed()
-    embed.title = title
-    embed.description = msg
-    return embed
+# def __convert_to_chunks(title: str, msg: str):
+#     """
+#     Converts the message sent in chunks for proper discord message send.
+#     """
+#     embeds = []
+#
+#     if len(msg) < EMBEDDED_MSG_SIZE:
+#         embed = __create_embed(title=title, msg=msg)
+#         embeds.append(embed)
+#     else:
+#         msgs = msg.split('\n')
+#
+#         des = ""
+#         for message in msgs:
+#             if len(des) < EMBEDDED_MSG_SIZE:
+#                 des += message + '\n'
+#             else:
+#                 embed = __create_embed(title=title, msg=des)
+#                 embeds.append(embed)
+#                 des = ""
+#
+#         if len(des) > 3:  # ensure there is message
+#             embed = __create_embed(title=title, msg=des)
+#             embeds.append(embed)
+#
+#     return embeds
+#
+#
+# def __create_embed(title: str, msg: str):
+#     embed = discord.Embed()
+#     embed.title = title
+#     embed.description = msg
+#     return embed
 
 
 def __clean_user_args(data: List[str]):

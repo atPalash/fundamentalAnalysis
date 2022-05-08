@@ -35,36 +35,33 @@ class GoogleNewsHandler:
     @staticmethod
     def get_headlines(ticker=None, past_days=30, max_news_count=50):
         googlenews = GoogleNewsHandler.__initialise()
-        
-        if GoogleNewsHandler._ticker_news_map.get(ticker) is None:
-            gn = googlenews.search(query=f"allintitle:{ticker}", when=f"{past_days}d")
-            ticker_news = []
-            for news in gn['entries']:
-                ticker_news.append(News(news['title'], news['link']))
+        gn = googlenews.search(query=f"intitle:{ticker}", when=f"{past_days}d")
+        ticker_news = []
+        for news in gn['entries']:
+            ticker_news.append(News(news['title'], news['link']))
 
-            GoogleNewsHandler._ticker_news_map[ticker] = ticker_news
-
+        GoogleNewsHandler._ticker_news_map[ticker] = ticker_news
         news_list_len = len(GoogleNewsHandler._ticker_news_map[ticker])
         news_count = max_news_count if news_list_len > max_news_count else news_list_len
         return GoogleNewsHandler._ticker_news_map[ticker][:news_count]
 
     @staticmethod
-    def get_sentiment(ticker=None, max_news_count=10):
+    def get_sentiment(ticker=None):
         """
-        Defaults to past_days and max_news_count as defined by the user while getting headlines. User should send the
-        index of the news article to get from list of headlines.
+        Gets the sentiment from the headlines collected when the user call headlines with parameter,
+        e.g. headlines: Tata, 30, 60. To increase range of headlines the user must call headlines with updated arguments
         """
         if GoogleNewsHandler._ticker_news_map.get(ticker) is None:
             GoogleNewsHandler.get_headlines(ticker=ticker)
 
-        news_list_len = len(GoogleNewsHandler._ticker_news_map[ticker])
-        news_count = max_news_count if news_list_len > max_news_count else news_list_len
-        news_list = GoogleNewsHandler._ticker_news_map[ticker][:news_count]
+        # hardcode to calculate sentiment. since computation takes time.
+        news_list_len = min(len(GoogleNewsHandler._ticker_news_map[ticker]), 10)
+        news_list = GoogleNewsHandler._ticker_news_map[ticker][:news_list_len]
         positive_sentiment = 0
         negative_sentiment = 0
         neutral_sentiment = 0
         for news in news_list:
-            article = Article(news.link, config=GoogleNewsHandler._config) #providing the link
+            article = Article(news.link, config=GoogleNewsHandler._config)  # providing the link
             try:
                 article.download()  # downloading the article
                 article.parse()  # parsing the article

@@ -141,7 +141,6 @@ def stock(*args):
         res += f"{stk}:{indicator_results[ind][stk_nse]}"
     return res
 
-
 def __clean_user_args(data: List[str]):
     ret = [x.strip() for x in data]
     return ret

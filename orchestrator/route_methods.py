@@ -113,41 +113,7 @@ def sentiment(*args):
         ticker_sentiments += f"{ticker}: {senti}\n"
     return ticker_sentiments
 
-
-# def __convert_to_chunks(title: str, msg: str):
-#     """
-#     Converts the message sent in chunks for proper discord message send.
-#     """
-#     embeds = []
-#
-#     if len(msg) < EMBEDDED_MSG_SIZE:
-#         embed = __create_embed(title=title, msg=msg)
-#         embeds.append(embed)
-#     else:
-#         msgs = msg.split('\n')
-#
-#         des = ""
-#         for message in msgs:
-#             if len(des) < EMBEDDED_MSG_SIZE:
-#                 des += message + '\n'
-#             else:
-#                 embed = __create_embed(title=title, msg=des)
-#                 embeds.append(embed)
-#                 des = ""
-#
-#         if len(des) > 3:  # ensure there is message
-#             embed = __create_embed(title=title, msg=des)
-#             embeds.append(embed)
-#
-#     return embeds
-#
-#
-# def __create_embed(title: str, msg: str):
-#     embed = discord.Embed()
-#     embed.title = title
-#     embed.description = msg
-#     return embed
-
+    
 
 def __clean_user_args(data: List[str]):
     ret = [x.strip() for x in data]

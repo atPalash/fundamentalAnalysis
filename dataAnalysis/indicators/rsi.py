@@ -62,9 +62,9 @@ class TickersRsi(Indicator):
             for k, v in _rsi_below_lower_stocks.items():
                 rsi_lower += f"{k}: {v}\n"
 
-            self.log_message(log_msg=f"{self.name} buy---------------------\n" + rsi_upper, log_level=LogLevel.Info,
+            self.log_message(log_msg=f"{self.name} sell---------------------\n" + rsi_upper, log_level=LogLevel.Info,
                              discord_msg=rsi_upper, discord_channel="sell")
-            self.log_message(log_msg=f"{self.name} sell--------------------\n" + rsi_lower, log_level=LogLevel.Info,
+            self.log_message(log_msg=f"{self.name} buy----------------------\n" + rsi_lower, log_level=LogLevel.Info,
                              discord_msg=rsi_lower, discord_channel="buy")
 
         except Exception as e:

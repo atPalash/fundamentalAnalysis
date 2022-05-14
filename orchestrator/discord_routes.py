@@ -21,3 +21,7 @@ class DiscordRoutes:
     def stop(self):
         DiscordListener.stop()
         self.route_methods = {}
+
+    @staticmethod
+    def set_indicator_results(indicator_results: dict):
+        route.set_indicator_results(indicator_results)

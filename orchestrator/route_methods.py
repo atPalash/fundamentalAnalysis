@@ -1,15 +1,19 @@
 import discord
 from typing import List
-
 from stockNews.google_news_handler import GoogleNewsHandler
 
-EMBEDDED_MSG_SIZE = 2096
 user_config = {}
+indicator_results = {}
 
 
 def set_configs(config: dict):
     global user_config
     user_config = config
+
+
+def set_indicator_results(results: dict):
+    global indicator_results
+    indicator_results = results
 
 
 def commands(*args):
@@ -114,39 +118,28 @@ def sentiment(*args):
     return ticker_sentiments
 
 
-# def __convert_to_chunks(title: str, msg: str):
-#     """
-#     Converts the message sent in chunks for proper discord message send.
-#     """
-#     embeds = []
-#
-#     if len(msg) < EMBEDDED_MSG_SIZE:
-#         embed = __create_embed(title=title, msg=msg)
-#         embeds.append(embed)
-#     else:
-#         msgs = msg.split('\n')
-#
-#         des = ""
-#         for message in msgs:
-#             if len(des) < EMBEDDED_MSG_SIZE:
-#                 des += message + '\n'
-#             else:
-#                 embed = __create_embed(title=title, msg=des)
-#                 embeds.append(embed)
-#                 des = ""
-#
-#         if len(des) > 3:  # ensure there is message
-#             embed = __create_embed(title=title, msg=des)
-#             embeds.append(embed)
-#
-#     return embeds
-#
-#
-# def __create_embed(title: str, msg: str):
-#     embed = discord.Embed()
-#     embed.title = title
-#     embed.description = msg
-#     return embed
+def indicator(*args):
+    global indicator_results
+    query = __clean_user_args(args[0].split(","))
+
+    res = ""
+    stocks = query[1:]
+    for stk in stocks:
+        stk_nse = f"{stk.upper()}.NS"
+        res += f"{stk}:{indicator_results[query[0]][stk_nse]}"
+    return res
+
+
+def stock(*args):
+    global indicator_results
+    query = __clean_user_args(args[0].split(","))
+    stk = query[0]
+    res = ""
+    indicators = query[1:]
+    for ind in indicators:
+        stk_nse = f"{stk.upper()}.NS"
+        res += f"{stk}:{indicator_results[ind][stk_nse]}"
+    return res
 
 
 def __clean_user_args(data: List[str]):
@@ -154,4 +147,4 @@ def __clean_user_args(data: List[str]):
     return ret
 
 
-route_methods = dict(commands=commands, headlines=headlines, sentiment=sentiment)
+route_methods = dict(commands=commands, headlines=headlines, sentiment=sentiment, indicator=indicator, stock=stock)

@@ -11,9 +11,10 @@ from pytz import timezone
 import datetime
 
 
-class Orchestrator:  
+class Orchestrator:
     def __init__(self, user_config: str, indicator_config: str, selected_stocks_config: str, discord_config: str):
         try:
+            self.indicator_results = {}
             self.user_config_file = user_config
             self.user_config = read_config(user_config)
             self.indicator_config = read_config(indicator_config)
@@ -40,7 +41,6 @@ class Orchestrator:
                 nse_delay = self.wait_for_next()
                 start_time = time.time()
 
-                # DiscordBot.send_message(msg=str(start_time), channel=DiscordBotChannel.GENERAL)
                 # fetch data till current
                 stock_config = {
                     'tickers': selected_stocks,
@@ -48,15 +48,18 @@ class Orchestrator:
                     'period': self.user_config['yf_period']
                 }
                 yfinance = YFinanceLiveData(stock_config)
-                data = yfinance.get_ticker_data()
+                data = yfinance.get_tickers_historical_data()
 
                 # RSI analysis
-                rsi_config = RsiConfig(name="RSI", timeperiod=self.indicator_config['rsi']['window'],
+                rsi_config = RsiConfig(name="rsi", timeperiod=self.indicator_config['rsi']['window'],
                                        ohlc=self.indicator_config['rsi']['ohlc'],
                                        upper=self.indicator_config['rsi']['upper'],
                                        lower=self.indicator_config['rsi']['lower'])
-                tickers_rsi = TickersRsi(name="Rsi", config=rsi_config, data=data)
+                tickers_rsi = TickersRsi(name="rsi", config=rsi_config, data=data)
                 tickers_rsi.do_analysis(selected_stocks=selected_stocks)
+                self.indicator_results[tickers_rsi.name] = tickers_rsi.get_result()
+
+                self.discord_routes.set_indicator_results(self.indicator_results)
 
                 end_time = time.time()
                 delay = nse_delay * 60 - (end_time - start_time)

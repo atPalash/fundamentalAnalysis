@@ -13,10 +13,39 @@ class Indicator:
         self.config = config
         self.data = data
         self.name = name
+        self.results = {}
 
     @abstractmethod
     def do_analysis(self, selected_stocks: list):
         pass
+
+    def set_result(self, result: dict):
+        """
+        set the result dict. As shown in the following format.
+        {
+            indicator1: {
+                stock1 : value1
+                stock2 : value2
+                .
+                .
+                .
+            },
+            indicator2: {
+                stock1 : value1
+                stock2 : value2
+                .
+                .
+                .
+            },
+            .
+            .
+            .
+        }
+        """
+        self.results = result
+
+    def get_result(self):
+        return self.results
 
     # Set data on which the indicator calculation is to be done
     @abstractmethod

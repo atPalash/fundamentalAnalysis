@@ -1,10 +1,9 @@
 import numpy as np
 import pandas
-import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
-from keras.models import Sequential, load_model
-from keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.layers import LSTM, Dense, Dropout
 
 
 class LstmPredictor:
@@ -34,7 +33,7 @@ class LstmPredictor:
             count = 0
             for stock in self.selected_stocks:
                 count += 1
-                if debug and count > 2:
+                if debug and count > 1:
                     break
 
                 series = self.selected_stocks_df[self.selected_feature][stock]

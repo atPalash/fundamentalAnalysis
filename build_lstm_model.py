@@ -48,9 +48,9 @@ if __name__ == "__main__":
             past_data_count = 50
             lstm = LstmPredictor(model_save_folder_path=result_folder, selected_feature='Close',
                                  past_data_point_count=past_data_count, selected_stocks=selected_stocks)
-            if platform.system().lower().startswith("windows") and build_model:
+            if build_model:
                 lstm.init_model(selected_stocks_df=data, train_test_ratio=0.8, epochs=50)
-                lstm.build_model(debug=False)
+                lstm.build_model(debug=True)
             else:
                 lstm.predict(current_data=data[-past_data_count*2:])
 

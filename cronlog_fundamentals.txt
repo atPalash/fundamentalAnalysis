@@ -17,3 +17,11 @@ Terminated
 /home/pi/Dev/fundamentalAnalysis downloading fundamentals and converting to excel
 (3, 153)
 Elapsed  37.74286937713623
+/home/pi/Dev/fundamentalAnalysis downloading fundamentals and converting to excel
+('Connection broken: IncompleteRead(10088 bytes read, 152 more expected)', IncompleteRead(10088 bytes read, 152 more expected))
+(1601, 151)
+Elapsed  20162.760592460632
+/home/pi/Dev/fundamentalAnalysis downloading fundamentals and converting to excel
+HTTPSConnectionPool(host='finance.yahoo.com', port=443): Max retries exceeded with url: /quote/MANINDS.NS (Caused by NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x6eeae430>: Failed to establish a new connection: [Errno -3] Temporary failure in name resolution'))
+(949, 152)
+Elapsed  12149.879462003708

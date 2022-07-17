@@ -16,3 +16,59 @@ start analysis
 start analysis
 start analysis
 start analysis
+Warning - Certain functionality 
+             requires requests_html, which is not installed.
+             
+             Install using: 
+             pip install requests_html
+             
+             After installation, you may have to restart your Python session.
+Warning - Certain functionality 
+             requires requests_html, which is not installed.
+             
+             Install using: 
+             pip install requests_html
+             
+             After installation, you may have to restart your Python session.
+Warning - Certain functionality 
+             requires requests_html, which is not installed.
+             
+             Install using: 
+             pip install requests_html
+             
+             After installation, you may have to restart your Python session.
+Warning - Certain functionality 
+             requires requests_html, which is not installed.
+             
+             Install using: 
+             pip install requests_html
+             
+             After installation, you may have to restart your Python session.
+Warning - Certain functionality 
+             requires requests_html, which is not installed.
+             
+             Install using: 
+             pip install requests_html
+             
+             After installation, you may have to restart your Python session.
+Warning - Certain functionality 
+             requires requests_html, which is not installed.
+             
+             Install using: 
+             pip install requests_html
+             
+             After installation, you may have to restart your Python session.
+Warning - Certain functionality 
+             requires requests_html, which is not installed.
+             
+             Install using: 
+             pip install requests_html
+             
+             After installation, you may have to restart your Python session.
+Warning - Certain functionality 
+             requires requests_html, which is not installed.
+             
+             Install using: 
+             pip install requests_html
+             
+             After installation, you may have to restart your Python session.

@@ -2,9 +2,7 @@ import numpy as np
 import pandas
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
-from tensorflow.keras.models import Sequential, load_model
-from tensorflow.keras.layers import LSTM, Dense, Dropout
-
+import tensorflow as tf
 
 class LstmPredictor:
     def __init__(self, model_save_folder_path: str, selected_stocks, selected_feature: str, past_data_point_count: int = 50):
@@ -105,7 +103,7 @@ class LstmPredictor:
                 x_test, y_test = self.__create_dataset(dataset_test)
                 x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
 
-                model = load_model(f'{self.model_save_path}/{stock}.h5')
+                model = tf.keras.models.load_model(f'{self.model_save_path}/{stock}.h5')
                 prediction = model.predict(x_test)
                 prediction = self.scaler.inverse_transform(prediction)
                 y_test_scaled = self.scaler.inverse_transform(y_test.reshape(-1, 1))
@@ -126,16 +124,16 @@ class LstmPredictor:
 
     @staticmethod
     def __build_neural_layer(shape):
-        model = Sequential()
-        model.add(LSTM(units=96, return_sequences=True, input_shape=(shape, 1)))
-        model.add(Dropout(0.2))
-        model.add(LSTM(units=96, return_sequences=True))
-        model.add(Dropout(0.2))
-        model.add(LSTM(units=96, return_sequences=True))
-        model.add(Dropout(0.2))
-        model.add(LSTM(units=96))
-        model.add(Dropout(0.2))
-        model.add(Dense(units=1))
+        model = tf.keras.models.Sequential()
+        model.add(tf.keras.layers.LSTM(units=96, return_sequences=True, input_shape=(shape, 1)))
+        model.add(tf.keras.layers.Dropout(0.2))
+        model.add(tf.keras.layers.LSTM(units=96, return_sequences=True))
+        model.add(tf.keras.layers.Dropout(0.2))
+        model.add(tf.keras.layers.LSTM(units=96, return_sequences=True))
+        model.add(tf.keras.layers.Dropout(0.2))
+        model.add(tf.keras.layers.LSTM(units=96))
+        model.add(tf.keras.layers.Dropout(0.2))
+        model.add(tf.keras.layers.Dense(units=1))
         model.compile(loss='mean_squared_error', optimizer='adam')
         return model
 

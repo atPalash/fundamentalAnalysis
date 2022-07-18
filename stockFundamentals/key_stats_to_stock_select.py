@@ -12,7 +12,7 @@ def check_folder_path(folder_path:str):
         folder_path (str): folder path to check or create.
     """
     if not os.path.isdir(folder_path):
-        os.mkdir(folder_path)
+        os.makedirs(folder_path)
 
 def convert_pandas_types(df, folder):
     for col in df:
@@ -26,7 +26,7 @@ def convert_pandas_types(df, folder):
 
 
 if __name__ == "__main__":
-    date_time = datetime.now().strftime('%H_%M_%d_%m_%Y')
+    date_time = datetime.now().strftime('%Y_%m_%d_%H_%M')
     current_working_directory = Path("stockFundamentals")
     database_folder = current_working_directory / "database"
     previous_database_folder = database_folder / "previous"

@@ -1,39 +1,50 @@
 to_buy:
+# basic material
   - ASIANPAINT
-  - ADANIGREEN
-  - ATGL
-  - ADANITRANS
-  - ADANIENT
-  - BAJFINANCE
-  - BAJAJFINSV
-  - BEL
-  - DIVISLAB
-  - DLF
-  - GODREJPROP
+  - PIDILITIND
+# Communication services
+  - BHARTIARTL
+  - ROUTE
+# Consumer cyclical
+  - TATAMOTORS
+  - BHARATFORG
+# Consumer defensive
+  - DMART
+  - TATACONSUM
+  - PGHL
   - HATSUN
+# Energy 
+  - DEEPENR
+  - ADANIENT
+  - HINDOILEXP
+  - RELIANCE
+# Financial services
+  - ICICIPRULI
   - HDFCLIFE
   - HDFCBANK
-  - INFY
-  - LT
-  - MCDOWELL-N
-  - NAUKRI
-  - POWERINDIA
-  - PHOENIXLTD
-  - QUESS
   - SBIN
-  - SBICARD
-  - SBILIFE
-  - SIEMENS
-  - RELIANCE
-  - ROUTE
+# Healthcare
+  - MAXHEALTH
+  - BIOCON
+  - SYNGENE
+# Industrial
+  - QUESS
+  - BEL
+# Technology
   - TATAELXSI
-  - TATACONSUM
   - TCS
-  - TATACHEM
-  - TITAN
+  - INFY
+  - DIXON
+  - ITI
+# Utilities 
+  - ADANIGREEN
+  - ATGL
+  - ADANITRANS 
+  
 to_sell:
   - CARTRADE
   - BERGEPAINT
   - EVEREADY
   - ITC
   - NLCINDIA
+  - TITAN

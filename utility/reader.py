@@ -6,6 +6,6 @@ def read_config(path):
         try:
             parsed_yaml = yaml.safe_load(stream)
             return parsed_yaml
-        except yaml.YAMLError as exc:
+        except Exception as exc:
             print(exc)
             return None

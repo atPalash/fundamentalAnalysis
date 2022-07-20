@@ -9,7 +9,52 @@ from pathlib import Path
 import subprocess
 import platform
 
+
+class LstmModel:
+    def __init__(self):
+        self.name = "lstm"
+
+        # Logger.log("STARTING lstm model build", LogLevel.Info)
+        conf_folder = Path("conf")
+        user_config = read_config((conf_folder / "user.yml").resolve(strict=True).as_posix())
+        selected_stocks_config = read_config((conf_folder / "selected_stocks.yml").resolve(strict=True).as_posix())
+        discord_config = read_config((conf_folder / "discord.yml").resolve(strict=True).as_posix())
+        lstm_config = read_config((conf_folder / "lstm.yml").resolve(strict=True).as_posix())
+        result_folder = Path("result/lstm").resolve(strict=True).as_posix()
+
+        selected_stocks = selected_stocks_config['to_buy'] + selected_stocks_config['to_sell']
+        selected_stocks = [stock + ".NS" for stock in selected_stocks]
+
+        # fetch data till current
+        stock_config = {
+            'tickers': selected_stocks,
+            'interval': lstm_config['yf_interval'],
+            'period': lstm_config['yf_period']
+        }
+        yfinance = YFinanceLiveData(stock_config)
+        self.data = yfinance.get_tickers_historical_data()
+        self.past_data_count = 50
+        self.lstm = LstmPredictor(model_save_folder_path=result_folder, selected_feature='Close',
+                                  past_data_point_count=self.past_data_count, selected_stocks=selected_stocks,
+                                  debug=False, debug_count=2)  # edit these to debug
+
+    def build_model(self):
+        print("start lstm model build")
+        self.lstm = self.lstm.init_model(selected_stocks_df=self.data, train_test_ratio=0.8,
+                                         epochs=20)
+        self.lstm.build_model()
+
+    def predict_with_model(self):
+        predictions = self.lstm.predict(current_data=self.data[-self.past_data_count * 2:])
+        print("some")
+
+
+# This will be run by cron daily at the end of day
 if __name__ == "__main__":
+    lstmodel = LstmModel()
+    lstmodel.build_model()
+
+    '''
     try:
         args = sys.argv[1:]
 
@@ -20,13 +65,13 @@ if __name__ == "__main__":
         cmd = ["ps -ef | grep .*python.*fundamentalAnalysis/build_lstm_model.py"]
         process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         model_pid, err = process.communicate()
-        Logger.log(f"do not try to build another model {model_pid.splitlines()}", log_level=LogLevel.Info)
+        # Logger.log(f"do not try to build another model {model_pid.splitlines()}", log_level=LogLevel.Info)
         if len(model_pid.splitlines()) > 3:
-            Logger.log("build model instance already running, no need to start another.", log_level=LogLevel.Error)
+            # Logger.log("build model instance already running, no need to start another.", log_level=LogLevel.Error)
             exit()
         else:
             print("start lstm model build")
-            Logger.log("STARTING lstm model build", LogLevel.Info)
+            # Logger.log("STARTING lstm model build", LogLevel.Info)
             conf_folder = Path("conf")
             user_config = read_config((conf_folder/"user.yml").resolve(strict=True).as_posix())
             selected_stocks_config = read_config((conf_folder/"selected_stocks.yml").resolve(strict=True).as_posix())
@@ -40,17 +85,19 @@ if __name__ == "__main__":
             # fetch data till current
             stock_config = {
                 'tickers': selected_stocks,
-                'interval': user_config['yf_interval'],
-                'period': user_config['yf_period']
+                'interval': lstm_config['yf_interval'],
+                'period': lstm_config['yf_period']
             }
             yfinance = YFinanceLiveData(stock_config)
             data = yfinance.get_tickers_historical_data()
+
             past_data_count = 50
             lstm = LstmPredictor(model_save_folder_path=result_folder, selected_feature='Close',
-                                 past_data_point_count=past_data_count, selected_stocks=selected_stocks)
+                                 past_data_point_count=past_data_count, selected_stocks=selected_stocks, debug=True,
+                                 debug_count=2)
             if build_model:
-                lstm.init_model(selected_stocks_df=data, train_test_ratio=0.8, epochs=50)
-                lstm.build_model(debug=True)
+                lstm.init_model(selected_stocks_df=data[:-past_data_count*2], train_test_ratio=0.8, epochs=20)
+                lstm.build_model()
             else:
                 lstm.predict(current_data=data[-past_data_count*2:])
 
@@ -58,3 +105,4 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         exit(e)
+    '''

@@ -7,7 +7,8 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout
 
 
 class LstmPredictor:
-    def __init__(self, model_save_folder_path: str, selected_stocks, selected_feature: str, past_data_point_count: int = 50):
+    def __init__(self, model_save_folder_path: str, selected_stocks, selected_feature: str,
+                 past_data_point_count: int = 50, debug: bool = False, debug_count:int = 5):
         self.selected_stocks = selected_stocks
         self.epochs = None
         self.train_test_ratio = None
@@ -16,6 +17,8 @@ class LstmPredictor:
         self.selected_stocks_df = None
         self.model_save_path = model_save_folder_path
         self.scaler = MinMaxScaler(feature_range=(0, 1))
+        self.debug = debug
+        self.debug_count = debug_count
 
     def init_model(self, selected_stocks_df: pandas.DataFrame, train_test_ratio: float = 0.8,
                    epochs: int = 50):
@@ -23,7 +26,7 @@ class LstmPredictor:
         self.train_test_ratio = train_test_ratio
         self.epochs = epochs
 
-    def build_model(self, debug: bool = False):
+    def build_model(self):
         """
         This model is being trained on 80% of the data, and last 20% of data are unseen by the model. here, the entire
         dataframe is passed since we also use it for debugging and testing purpose.
@@ -33,7 +36,7 @@ class LstmPredictor:
             count = 0
             for stock in self.selected_stocks:
                 count += 1
-                if debug and count > 1:
+                if self.debug and count > self.debug_count:
                     break
 
                 series = self.selected_stocks_df[self.selected_feature][stock]
@@ -98,7 +101,11 @@ class LstmPredictor:
 
         predictions = {}
         try:
+            count = 0
             for stock in self.selected_stocks:
+                count += 1
+                if self.debug and count > self.debug_count:
+                    break
                 dataset_test = current_data[self.selected_feature][stock]
                 dataset_test = np.array(dataset_test).reshape(-1, 1)
                 dataset_test = self.scaler.fit_transform(dataset_test)
@@ -148,8 +155,3 @@ class LstmPredictor:
         x = np.array(x)
         y = np.array(y)
         return x, y
-
-
-'''
-
-'''

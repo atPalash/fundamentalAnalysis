@@ -31,6 +31,12 @@ class YFinanceLiveData:
             ret[tick] = stock_info.get_live_price(tick)
         return ret
 
+    def get_ticker_info(self):
+        ret = {}
+        for tick in self.stock_config['tickers']:
+            ret[tick] = yf.Ticker(tick)
+        return ret
+
     def plot_data(self, ticker):
         """
         A Debug plot method

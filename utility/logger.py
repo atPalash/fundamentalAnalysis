@@ -2,9 +2,10 @@ import logging
 from enum import Enum
 from inspect import getframeinfo, stack
 from urllib3 import connectionpool
-from discord import client, webhook
+from discord import webhook
 from pathlib import Path
 from datetime import datetime
+
 
 class LogLevel(Enum):
     Debug = 1

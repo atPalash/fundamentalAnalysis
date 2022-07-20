@@ -15,3 +15,21 @@ ROA + PE in top bracket for stock having considerable Capital.
 4. Check indicator value for each stock using stock name.
 5. Keep track of all the stocks bought maybe possible from zerodha app. Download the file and keep it here.
 3. 
+
+ 1639  python3 -m pip install tensorflow --no-cache-dir
+ 1640  pip list
+ 1641  python3 -m pip install sklearn pandas --no-cache-dir
+ 1642  python3 -m pip install matplotlib --no-cache-dir
+ 1643  python3 -m pip install yahoo-fin plotly --no-cache-dir
+ 1644  python3 -m pip install discord --no-cache-dir
+ 1645  python3 -m pip install pyyaml --no-cache-dir
+ 1646  python3 -m pip install yfinance --no-cache-dir
+
+  1639  python3 -m pip install tensorflow sklearn pandas matplotlib yahoo-fin discord pyyaml yfinance --no-cache-dir
+ 
+ 1641  python3 -m pip install sklearn pandas --no-cache-dir
+ 1642  python3 -m pip install matplotlib --no-cache-dir
+ 1643  python3 -m pip install yahoo-fin plotly --no-cache-dir
+ 1644  python3 -m pip install discord --no-cache-dir
+ 1645  python3 -m pip install pyyaml --no-cache-dir
+ 1646  python3 -m pip install yfinance --no-cache-dir

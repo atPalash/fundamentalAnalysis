@@ -22,7 +22,7 @@ class Logger:
     def __initialise():
         if Logger._logger is None:
             log_folder = Path("logs")
-            logfile = datetime.now().strftime('%H_%M_%d_%m_%Y.log')
+            logfile = datetime.now().strftime('%Y_%m_%d_%H_%M.log')
             all_log = log_folder / logfile
             
             # create a log file if not exist

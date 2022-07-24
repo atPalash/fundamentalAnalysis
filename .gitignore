@@ -8,3 +8,4 @@ get-pip.py
 conf/discord.yml
 *.log
 stockFundamentals/database
+ai/output

@@ -7,7 +7,7 @@ import tensorflow as tf
 
 class LstmPredictor:
     def __init__(self, model_save_folder_path: str, selected_stocks, selected_feature: str,
-                 past_data_point_count: int = 50, debug: bool = False, debug_count:int = 5):
+                 past_data_point_count: int = 50, debug: bool = False, debug_count: int = 5):
         self.selected_stocks = selected_stocks
         self.epochs = None
         self.train_test_ratio = None

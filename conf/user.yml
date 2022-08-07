@@ -1,6 +1,6 @@
 # to debug logic use one stock as test.
 debug_stock:  ''
-debugging: True
+debugging: False
 # log folder
 log_folder: log
 # path where the result csv is created.
@@ -20,3 +20,5 @@ nse:
 google_news:
   past_days: 10
   max_news_count: 10
+# highlow52
+band_percentage: 10

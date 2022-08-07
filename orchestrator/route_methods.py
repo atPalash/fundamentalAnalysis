@@ -145,6 +145,7 @@ def stock(*args):
         res += f"{stk}:{indicator_results[ind][stk_nse]}"
     return res
 
+
 def highlow52w(*args):
     """
     Inform user of selected stocks currently at their 52 weeks high and low.
@@ -152,47 +153,84 @@ def highlow52w(*args):
     Parameters
     ----------
     args :
-        No arguments - shows only selected stocks
+        sel - shows only selected stocks
+        OR
         all - checks all NSE traded stocks and lists them.
 
+        band_range - percentage of range for high and low.
     Returns
     ---------
         discord embedded message with list of stocks at 52 week high or low. 
 
     Example
     ---------
-    highlow52W: -> shows list of stocks at 52 high / low.
-    highlow52W: all -> shows list of all nse stocks at 52 high / low.
+    highlow52W: sel, 10 -> shows list of selected stocks within  52 high / low.
+    highlow52W: all, 10 -> shows list of all nse stocks at 52 high / low.
     """ 
     try:
         configuration = conf_editor.read()
         query = __clean_user_args(args[0].split(","))
         selected_stocks = []
-        if query != 'all':
+        if query[0] == 'sel':
             stocks = configuration['selected_stocks_config']['to_buy'] + configuration['selected_stocks_config']['to_sell']
             selected_stocks = [stock + ".NS" for stock in stocks]
+        elif query[0] == 'all':
+            all_nse_stocks = pandas.read_csv('conf/ind_NseList.csv')['SYMBOL']
+            selected_stocks = [stock + ".NS" for stock in all_nse_stocks]
         else:
-            all_nse_stocks = pandas.read_csv('conf/ind_NseList.csv')['NseSymbol']
-            selected_stocks = [all_nse_stocks + ".NS" for stock in selected_stocks]
-    
-        # fetch 52 week data till current
-        stock_config = {
-            'tickers': selected_stocks,
-            'interval': configuration['user_config']['yf_interval'],
-            'period': '1y'
-        }
-        yfinance = YFinanceLiveData(stock_config)
-        data = yfinance.get_tickers_historical_data()
-        
+            return "use sel or all as argument"
+
+        if len(query) > 1 and query[1].isdigit():
+            band_percentage = int(query[1])
+        else:
+            band_percentage = configuration['user_config']['band_percentage']
+
         high52w = {}
         low52w = {}
-        
-        for stock in selected_stocks:
-            if data['High'][stock][-1] > data['High'][stock][:-1].max():
-                high52w[stock]
-        return "hello"
+        batch_size = 50
+        batches = [selected_stocks[i:i + batch_size] for i in range(0, len(selected_stocks), batch_size)]
+        # call in batches
+        for batch in batches:
+            print("start batch")
+            # fetch 52 week data till current
+            stock_config = {
+                'tickers': batch,
+                'interval': configuration['user_config']['yf_interval'],
+                'period': '1y'
+            }
+            yfinance = YFinanceLiveData(stock_config)
+            data = yfinance.get_tickers_historical_data()
+
+            for stk in batch:
+                try:
+                    # Check if current price is greater than the highest 52 week price range
+                    high52 = data['High'][stk].max()
+                    if data['High'][stk][-1] >= high52 - high52 * band_percentage/100:
+                        high52w[stk] = high52
+
+                    # Check if current price is lower than the lower 52 week price range
+                    low52 = data['Low'][stk].min()
+                    if data['Low'][stk][-1] <= low52 + low52 * band_percentage / 100:
+                        low52w[stk] = low52
+                except Exception as e:
+                    print(f"{stk} exception: {e.args[0]}")
+
+        res = "*** 52W high ***\n"
+        count = 1
+        for stk, val in high52w.items():
+            res += f"{count}. {stk}: {val} \n "
+            count += 1
+
+        res += "\n*** 52W low ***\n"
+        count = 1
+        for stk, val in low52w.items():
+            res += f"{count}. {stk}: {val} \n "
+            count += 1
+
+        return res
     except Exception as e:
-        raise
+        print(e)
+
 
 def __clean_user_args(data: List[str]):
     ret = [x.strip() for x in data]

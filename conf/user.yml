@@ -20,3 +20,5 @@ nse:
 google_news:
   past_days: 10
   max_news_count: 10
+# highlow52
+band_percentage: 10

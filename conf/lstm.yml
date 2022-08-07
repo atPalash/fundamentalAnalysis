@@ -4,7 +4,7 @@ debugging: True
 # log folder
 log_folder: log
 # path where the result csv is created.
-models_folder: D:\pythonProjects\fundamentalAnalysis\ai\output\models\lstm
+models_folder: output\models\lstm
 # yahoo finance parameters
 yf_interval: 60m
 yf_period: 2y

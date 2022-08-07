@@ -1,11 +1,15 @@
 import discord
 from typing import List
+
+import pandas
+from dataFetch.yfinance_live_data import YFinanceLiveData
 from stockNews.google_news_handler import GoogleNewsHandler
+from conf import conf_editor
 
 user_config = {}
 indicator_results = {}
 
-
+# TODO remove this
 def set_configs(config: dict):
     global user_config
     user_config = config
@@ -141,9 +145,58 @@ def stock(*args):
         res += f"{stk}:{indicator_results[ind][stk_nse]}"
     return res
 
+def highlow52w(*args):
+    """
+    Inform user of selected stocks currently at their 52 weeks high and low.
+
+    Parameters
+    ----------
+    args :
+        No arguments - shows only selected stocks
+        all - checks all NSE traded stocks and lists them.
+
+    Returns
+    ---------
+        discord embedded message with list of stocks at 52 week high or low. 
+
+    Example
+    ---------
+    highlow52W: -> shows list of stocks at 52 high / low.
+    highlow52W: all -> shows list of all nse stocks at 52 high / low.
+    """ 
+    try:
+        configuration = conf_editor.read()
+        query = __clean_user_args(args[0].split(","))
+        selected_stocks = []
+        if query != 'all':
+            stocks = configuration['selected_stocks_config']['to_buy'] + configuration['selected_stocks_config']['to_sell']
+            selected_stocks = [stock + ".NS" for stock in stocks]
+        else:
+            all_nse_stocks = pandas.read_csv('conf/ind_NseList.csv')['NseSymbol']
+            selected_stocks = [all_nse_stocks + ".NS" for stock in selected_stocks]
+    
+        # fetch 52 week data till current
+        stock_config = {
+            'tickers': selected_stocks,
+            'interval': configuration['user_config']['yf_interval'],
+            'period': '1y'
+        }
+        yfinance = YFinanceLiveData(stock_config)
+        data = yfinance.get_tickers_historical_data()
+        
+        high52w = {}
+        low52w = {}
+        
+        for stock in selected_stocks:
+            if data['High'][stock][-1] > data['High'][stock][:-1].max():
+                high52w[stock]
+        return "hello"
+    except Exception as e:
+        raise
+
 def __clean_user_args(data: List[str]):
     ret = [x.strip() for x in data]
     return ret
 
 
-route_methods = dict(commands=commands, headlines=headlines, sentiment=sentiment, indicator=indicator, stock=stock)
+route_methods = dict(commands=commands, headlines=headlines, sentiment=sentiment, indicator=indicator, stock=stock, highlow52w=highlow52w)

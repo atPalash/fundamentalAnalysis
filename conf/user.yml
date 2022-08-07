@@ -1,6 +1,6 @@
 # to debug logic use one stock as test.
 debug_stock:  ''
-debugging: False
+debugging: True
 # log folder
 log_folder: log
 # path where the result csv is created.

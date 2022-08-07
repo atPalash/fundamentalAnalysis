@@ -4,15 +4,15 @@ from pathlib import Path
 import subprocess
 
 if __name__ == "__main__":
-    cmd = ["ps -ef | grep .*python.*fundamentalAnalysis/main.py"]
-    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
-    stderr=subprocess.PIPE)
-    fundamental_pid, err = process.communicate()
-    Logger.log(f"fundamental analysis running process {fundamental_pid.splitlines()}", log_level=LogLevel.Info)
-    if len(fundamental_pid.splitlines()) > 3:
-        Logger.log("Fundamental analysis instance already running, no need to start another.", log_level=LogLevel.Error)
-        exit()
-    else:   
+    # cmd = ["ps -ef | grep .*python.*fundamentalAnalysis/main.py"]
+    # process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, 
+    # stderr=subprocess.PIPE)
+    # fundamental_pid, err = process.communicate()
+    # Logger.log(f"fundamental analysis running process {fundamental_pid.splitlines()}", log_level=LogLevel.Info)
+    # if len(fundamental_pid.splitlines()) > 3:
+    #     Logger.log("Fundamental analysis instance already running, no need to start another.", log_level=LogLevel.Error)
+    #     exit()
+    # else:   
         print("start analysis")
         Logger.log("STARTING ANALYSIS", LogLevel.Info)
         conf_folder = Path("conf")
@@ -29,7 +29,6 @@ if __name__ == "__main__":
                                     selected_stocks_config=selected_stocks_config, discord_config=discord_config)
         orchestrator.run()
         Logger.log(msg="closing analysis", log_level=LogLevel.Debug)
-
 
 
     

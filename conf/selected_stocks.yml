@@ -2,24 +2,27 @@ to_buy:
 # basic material
   - ASIANPAINT
   - PIDILITIND
+  - PREMEXPLN
 # Communication services
   - BHARTIARTL
   - ROUTE
 # Consumer cyclical
+  - TITAN
   - TATAMOTORS
   - BHARATFORG
 # Consumer defensive
-  - DMART
   - TATACONSUM
-  - PGHL
+  - BATAINDIA
   - HATSUN
+  - UBL
 # Energy 
   - DEEPENR
   - ADANIENT
-  - HINDOILEXP
   - RELIANCE
 # Financial services
+  - ONELIFECAP
   - ICICIPRULI
+  - SBILIFE
   - HDFCLIFE
   - HDFCBANK
   - SBIN
@@ -28,18 +31,23 @@ to_buy:
   - BIOCON
   - SYNGENE
 # Industrial
-  - QUESS
   - BEL
+  - ZENTEC
+  - SNOWMAN
+  - RIIL
+  - ABB
 # Technology
   - TATAELXSI
   - TCS
   - INFY
-  - DIXON
   - ITI
 # Utilities 
   - ADANIGREEN
   - ATGL
   - ADANITRANS 
+# Misc
+  - VIPIND
+  - IRCTC
   
 to_sell:
   - CARTRADE

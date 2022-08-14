@@ -3,7 +3,7 @@ import traceback
 from dataAnalysis.indicators.config import Config
 from dataAnalysis.indicators.indicator import Indicator
 
-import talib
+# import talib
 import pandas
 
 from utility.logger import LogLevel

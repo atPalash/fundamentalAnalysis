@@ -17,7 +17,7 @@ class DiscordRoutes:
             singletons['discord_listener'].add_route(k, v)
 
     def stop(self):
-        singletons['discord_listener'].stop()
+        # singletons['discord_listener'].stop()
         self.route_methods = {}
 
     @staticmethod

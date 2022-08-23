@@ -11,7 +11,7 @@ yf_period: 2y
 # poll interval in minutes should be similar to yf_interval above
 poll_interval: 60
 # stop the analysis
-stop: False
+stop: True
 # Nse details
 nse:
   open: "9:15"

@@ -1,6 +1,7 @@
 import time
 import traceback
 
+from conf.conf_editor import read
 from orchestrator.discord_routes import DiscordRoutes
 from utility.reader import read_config
 from utility.logger import LogLevel
@@ -36,7 +37,7 @@ class Orchestrator:
         selected_stocks = self.selected_stocks_config['to_buy'] + self.selected_stocks_config['to_sell']
         selected_stocks = [stock + ".NS" for stock in selected_stocks]
 
-        while not self.user_config['stop']:
+        while not read()['user_config']['stop']:
             try:
                 nse_delay = self.wait_for_next()
                 start_time = time.time()
@@ -49,7 +50,8 @@ class Orchestrator:
                 }
                 yfinance = YFinanceLiveData(stock_config)
                 data = yfinance.get_tickers_historical_data()
-
+                time.sleep(20)
+                '''
                 # RSI analysis
                 rsi_config = RsiConfig(name="rsi", timeperiod=self.indicator_config['rsi']['window'],
                                        ohlc=self.indicator_config['rsi']['ohlc'],
@@ -62,7 +64,8 @@ class Orchestrator:
                 self.discord_routes.set_indicator_results(self.indicator_results)
 
                 end_time = time.time()
-                delay = nse_delay * 60 - (end_time - start_time)
+                # delay = nse_delay * 60 - (end_time - start_time)
+                delay = 60
 
                 # if delay is more than 12hrs, stop this instance and cron will run another instance tomorrow
                 if delay >= 12 * 60 * 60 and not self.user_config['debugging']:
@@ -77,12 +80,12 @@ class Orchestrator:
                     self.discord_messenger.send_message(msg=msg, channel="general", title="next batch")
                     time.sleep(delay)
                     # self.user_config = read_config(self.user_config_file)
-
+                '''
             except Exception as e:
                 self.logger.log(msg=f"exception during run: {traceback.format_exc()}", log_level=LogLevel.Critical)
                 self.discord_messenger.send_message("general", msg=f"exception during run: {str(e)}",
                                                     title=f"{type(e).__name__}")
-        # self.logger .log(msg=f"Stopping orchestrator loop", log_level=LogLevel.Critical)
+        self.logger.log(msg=f"Stopping orchestrator loop", log_level=LogLevel.Critical)
         # self.discord_messenger.send_message("general", msg=f"Stopping orchestrator loop")
 
     def wait_for_next(self):

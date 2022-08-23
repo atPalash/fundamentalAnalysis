@@ -2,7 +2,6 @@ from conf.conf_editor import read
 from orchestrator.orchestrator import Orchestrator
 from utility.logger import LogLevel
 from utility.aggregator import singletons
-from pathlib import Path
 
 if __name__ == "__main__":
     print("start analysis")

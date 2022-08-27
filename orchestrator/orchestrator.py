@@ -3,9 +3,8 @@ import traceback
 
 from conf.conf_editor import read
 from orchestrator.discord_routes import DiscordRoutes
-from utility.reader import read_config
+from utility.aggregator import get_singletons
 from utility.logger import LogLevel
-from utility.aggregator import singletons
 from dataFetch.yfinance_live_data import YFinanceLiveData
 from dataAnalysis.indicators.rsi import RsiConfig, TickersRsi
 from pytz import timezone
@@ -13,20 +12,20 @@ import datetime
 
 
 class Orchestrator:
-    def __init__(self, user_config: dict, indicator_config: dict, selected_stocks_config: dict, discord_config: dict):
+    def __init__(self, configuration: dict):
         try:
             self.indicator_results = {}
-            self.user_config = user_config
-            self.indicator_config = indicator_config
-            self.selected_stocks_config = selected_stocks_config
+            self.user_config = configuration['user_config']
+            self.indicator_config = configuration['indicator_config']
+            self.selected_stocks_config = configuration['selected_stocks_config']
 
-            self.discord_config = discord_config
+            self.discord_config = configuration['discord_config']
 
             # First initialise discord messenger with general channel
+            singletons = get_singletons(configuration=configuration)
             self.logger = singletons['logger']
             self.discord_messenger = singletons['discord_messenger']
-            self.discord_routes = DiscordRoutes(name="query_routes", listener_config=self.discord_config['listener'],
-                                                user_config=self.user_config)
+            self.discord_routes = DiscordRoutes(name="query_routes", configuration=configuration) # will be updating this
 
         except Exception as e:
             self.logger.log(msg=f"exception during config read: {traceback.format_exc()}", log_level=LogLevel.Critical)

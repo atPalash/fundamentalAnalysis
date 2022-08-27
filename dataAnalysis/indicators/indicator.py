@@ -1,6 +1,5 @@
 from abc import abstractmethod
 from utility.logger import LogLevel
-from utility.aggregator import singletons
 
 
 class Indicator:
@@ -13,8 +12,8 @@ class Indicator:
         self.data = data
         self.name = name
         self.results = {}
-        self.logger = singletons['logger']
-        self.discord_messenger = singletons['discord_messenger']
+        # self.logger = singletons['logger']
+        # self.discord_messenger = singletons['discord_messenger']
 
     @abstractmethod
     def do_analysis(self, selected_stocks: list):
@@ -57,5 +56,5 @@ class Indicator:
         """
         Log results and exceptions in indicator
         """
-        self.logger.log(msg=log_msg, log_level=log_level)
-        self.discord_messenger.send_message(channel=discord_channel, msg=discord_msg, title=self.name)
+        # self.logger.log(msg=log_msg, log_level=log_level)
+        # self.discord_messenger.send_message(channel=discord_channel, msg=discord_msg, title=self.name)

@@ -21,7 +21,7 @@ class Logger(metaclass=Singleton):
     # TODO1: update logger with DI for log path
     def __init__(self):
         self.logger = None
-        self.log_folder = Path("logs")
+        self.log_folder = Path("../logs")
         self.logfile = datetime.now().strftime('%Y_%m_%d_%H_%M.log')
         self.all_log = self.log_folder / self.logfile
 
@@ -43,7 +43,7 @@ class Logger(metaclass=Singleton):
         logging.getLogger(webhook.__name__).setLevel(logging.CRITICAL)
         logging.getLogger('discord').setLevel(logging.CRITICAL)
 
-    def log(self, msg: str, log_level: LogLevel):
+    def log(self, msg: str, log_level: LogLevel = LogLevel.Debug):
         try:
             caller = getframeinfo(stack()[1][0])
             caller_info = "%s-%d-" % (caller.filename, caller.lineno)

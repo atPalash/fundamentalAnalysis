@@ -2,7 +2,7 @@ from pathlib import Path
 
 from utility.reader import read_config
 
-conf_folder = Path("conf")
+conf_folder = Path("D:\\pythonProjects\\fundamentalAnalysis\\conf")
 user_config = conf_folder / "user.yml"
 user_config = read_config(user_config.resolve(strict=True).as_posix())
 indicator_config = conf_folder / "indicator.yml"

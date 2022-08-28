@@ -1,0 +1,82 @@
+import requests
+from flask import Flask, request, jsonify
+
+from conf.conf_editor import read
+from request import Request, ErrorCode
+from serverIf import ServerIf
+from utility.discordBot.discord_listener import DiscordListener
+from utility.discordBot.discord_messenger import DiscordMessenger
+from utility.logger import Logger, LogLevel
+
+master_server_url = "http://127.0.0.1:8000/"
+this_server_url = "http://127.0.0.1:8001/"
+
+
+class Server(ServerIf):
+    def __init__(self, configuration):
+        self.name = "Utility server"
+        self.configuration = configuration
+        self.services = {}
+        self.routes = {}
+
+        self.discord_listener = DiscordListener(self.configuration['discord_config'])
+        self.discord_messenger = DiscordMessenger(self.configuration['discord_config']['messenger']['webhook'])
+        self.logger = Logger()
+
+        self.add_service("discord_listener", self.discord_listener)
+        self.add_service("discord_messenger", self.discord_messenger)
+        self.add_service("logger", self.logger)
+
+        self.register_routes_to_app()
+
+    def get_services(self):
+        return self.routes
+
+    def add_service(self, service, obj):
+        self.services[service] = obj
+        self.routes[service] = this_server_url
+
+    def register_routes_to_app(self):
+        ret = Request.post(master_server_url + "/route", data=self.routes)
+        print(ret)
+
+
+app = Flask(__name__)
+
+
+@app.get("/service")
+def get_service():
+    global server
+    return server.routes
+
+
+@app.post("/service")
+def call_service():
+    global server
+    if request.is_json:
+        err = ""
+        response = ""
+        error_code = ErrorCode.OK
+        try:
+            routes = request.get_json()
+
+            key = list(routes.keys())[0]
+            if key == "logger":
+                server.logger.log(msg=routes[key]['msg'], log_level=LogLevel.Debug)
+            elif key == "discord_messenger":
+                server.discord_messenger.send_message(channel=routes[key]['channel'],
+                                                      msg=routes[key]['msg'],
+                                                      title=routes[key]['title'])
+            return Request.make_response(error_code=error_code, err_message=err, body=response)
+        except Exception as e:
+            error_code = ErrorCode.Critical
+            err = f"{e.args}"
+            response = e
+            return Request.make_response(error_code=error_code, err_message=err, body=response)
+    err = f"request must be json"
+    return Request.make_response(error_code=ErrorCode.Critical, err_message=err), 415
+
+
+if __name__ == '__main__':
+    server = Server(read())
+    app.run(host="localhost", port=8001)

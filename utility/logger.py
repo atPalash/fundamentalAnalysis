@@ -6,6 +6,8 @@ from discord import webhook
 from pathlib import Path
 from datetime import datetime
 
+from utility.singleton import Singleton
+
 
 class LogLevel(Enum):
     Debug = 1
@@ -15,38 +17,34 @@ class LogLevel(Enum):
     Critical = 5
 
 
-class Logger:
-    _logger = None
+class Logger(metaclass=Singleton):
+    # TODO1: update logger with DI for log path
+    def __init__(self):
+        self.logger = logging.getLogger()
+        self.log_folder = Path("D:\\pythonProjects\\fundamentalAnalysis\\logs")
+        self.logfile = datetime.now().strftime('%Y_%m_%d_%H_%M.log')
+        self.all_log = self.log_folder / self.logfile
 
-    @staticmethod
-    def __initialise():
-        if Logger._logger is None:
-            log_folder = Path("logs")
-            logfile = datetime.now().strftime('%Y_%m_%d_%H_%M.log')
-            all_log = log_folder / logfile
-            
-            # create a log file if not exist
-            file_handler = logging.FileHandler(all_log, mode="w", encoding=None, delay=False)
-            file_handler.close()
-            
-            all_log = all_log.resolve(strict=True).as_posix()
-            logging.basicConfig(filename=all_log,
-                                format='%(asctime)s-%(levelname)s-%(message)s',
-                                filemode='w')
-            Logger._logger = logging.getLogger()
+        # create a log file if not exist
+        file_handler = logging.FileHandler(self.all_log, mode="w", encoding=None, delay=False)
+        file_handler.close()
 
-            # Setting the threshold of logger to DEBUG
-            Logger._logger.setLevel(logging.DEBUG)
+        self.all_log = self.all_log.resolve(strict=True).as_posix()
+        # logging.basicConfig(filename=self.all_log,
+        #                     format='%(asctime)s-%(levelname)s-%(message)s',
+        #                     filemode='w')
 
-            # http CRITICAL level to be logged only
-            logging.getLogger(connectionpool.__name__).setLevel(logging.CRITICAL)
-            logging.getLogger(webhook.__name__).setLevel(logging.CRITICAL)
-            logging.getLogger('discord').setLevel(logging.CRITICAL)
-        return Logger._logger
+        self.logger = logging.getLogger()
 
-    @staticmethod
-    def log(msg: str, log_level: LogLevel):
-        logger = Logger.__initialise()
+        # Setting the threshold of logger to DEBUG
+        self.logger.setLevel(logging.DEBUG)
+
+        # http CRITICAL level to be logged only
+        logging.getLogger(connectionpool.__name__).setLevel(logging.CRITICAL)
+        logging.getLogger(webhook.__name__).setLevel(logging.CRITICAL)
+        logging.getLogger('discord').setLevel(logging.CRITICAL)
+
+    def log(self, msg: str, log_level: LogLevel = LogLevel.Debug):
         try:
             caller = getframeinfo(stack()[1][0])
             caller_info = "%s-%d-" % (caller.filename, caller.lineno)
@@ -54,12 +52,12 @@ class Logger:
             caller_info = "Exception in logger-"
 
         if log_level is LogLevel.Info:
-            logger.info(caller_info + msg)
+            self.logger.info(caller_info + msg)
         elif log_level is LogLevel.Error:
-            logger.error(caller_info + msg)
+            self.logger.error(caller_info + msg)
         elif log_level is LogLevel.Warning:
-            logger.warning(caller_info + msg)
+            self.logger.warning(caller_info + msg)
         elif log_level is LogLevel.Critical:
-            logger.critical(caller_info + msg)
+            self.logger.critical(caller_info + msg)
         else:
-            logger.debug(caller_info + msg)
+            self.logger.debug(caller_info + msg)

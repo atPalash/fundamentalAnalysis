@@ -6,6 +6,8 @@ from newspaper import Config
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
+from singleton import Singleton
+
 
 @dataclass
 class News:
@@ -13,55 +15,49 @@ class News:
     link: str
 
 
-class GoogleNewsHandler:
-    _googlenews = None
-    _ticker_news_map = {}
-    _config = None
+class GoogleNewsHandler(metaclass=Singleton):
+    # _googlenews = None
+    # _ticker_news_map = {}
+    # _config = None
 
-    @staticmethod
-    def __initialise():
-        if GoogleNewsHandler._googlenews is None:
-            GoogleNewsHandler._googlenews = GoogleNews(country='IN')
+    def __init__(self):
+        self.googlenews = GoogleNews(country='IN')
+        self.ticker_news_map = {}
 
-            nltk.download('vader_lexicon')  # required for Sentiment Analysis
-            nltk.download('punkt')
-            user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0'
-            config = Config()
-            config.browser_user_agent = user_agent
-            config.request_timeout = 20
+        nltk.download('vader_lexicon')  # required for Sentiment Analysis
+        nltk.download('punkt')
+        user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0) Gecko/20100101 Firefox/78.0'
+        self.config = Config()
+        self.config.browser_user_agent = user_agent
+        self.config.request_timeout = 20
 
-        return GoogleNewsHandler._googlenews
-
-    @staticmethod
-    def get_headlines(ticker=None, past_days=30, max_news_count=50):
-        googlenews = GoogleNewsHandler.__initialise()
-        gn = googlenews.search(query=f"intitle:{ticker}", when=f"{past_days}d")
+    def get_headlines(self, ticker=None, past_days=30, max_news_count=50):
+        gn = self.googlenews.search(query=f"intitle:{ticker}", when=f"{past_days}d")
         ticker_news = []
         for news in gn['entries']:
             ticker_news.append(News(news['title'], news['link']))
 
-        GoogleNewsHandler._ticker_news_map[ticker] = ticker_news
-        news_list_len = len(GoogleNewsHandler._ticker_news_map[ticker])
+        self.ticker_news_map[ticker] = ticker_news
+        news_list_len = len(self.ticker_news_map[ticker])
         news_count = max_news_count if news_list_len > max_news_count else news_list_len
-        return GoogleNewsHandler._ticker_news_map[ticker][:news_count]
+        return self.ticker_news_map[ticker][:news_count]
 
-    @staticmethod
-    def get_sentiment(ticker=None):
+    def get_sentiment(self, ticker=None):
         """
         Gets the sentiment from the headlines collected when the user call headlines with parameter,
         e.g. headlines: Tata, 30, 60. To increase range of headlines the user must call headlines with updated arguments
         """
-        if GoogleNewsHandler._ticker_news_map.get(ticker) is None:
-            GoogleNewsHandler.get_headlines(ticker=ticker)
+        if self.ticker_news_map.get(ticker) is None:
+            self.get_headlines(ticker=ticker)
 
         # hardcode to calculate sentiment. since computation takes time.
-        news_list_len = min(len(GoogleNewsHandler._ticker_news_map[ticker]), 10)
-        news_list = GoogleNewsHandler._ticker_news_map[ticker][:news_list_len]
+        news_list_len = min(len(self.ticker_news_map[ticker]), 10)
+        news_list = self.ticker_news_map[ticker][:news_list_len]
         positive_sentiment = 0
         negative_sentiment = 0
         neutral_sentiment = 0
         for news in news_list:
-            article = Article(news.link, config=GoogleNewsHandler._config)  # providing the link
+            article = Article(news.link, config=self.config)  # providing the link
             try:
                 article.download()  # downloading the article
                 article.parse()  # parsing the article

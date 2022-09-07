@@ -1,3 +1,5 @@
+import traceback
+
 import requests
 from flask import Flask, request, jsonify
 
@@ -6,7 +8,7 @@ from request import Request, ErrorCode
 from serverIf import ServerIf
 from utility.discordBot.discord_listener import DiscordListener
 from utility.discordBot.discord_messenger import DiscordMessenger
-from utility.logger import Logger, LogLevel
+from utility.logger import LoggerFactory
 
 master_server_url = "http://127.0.0.1:8000/"
 this_server_url = "http://127.0.0.1:8001/"
@@ -18,12 +20,15 @@ class Server(ServerIf):
         self.configuration = configuration
         self.services = {}
         self.routes = {}
+        self.log_folder = r"D:\pythonProjects\fundamentalAnalysis\logs"
 
-        self.discord_listener = DiscordListener(self.configuration['discord_config'])
         self.discord_messenger = DiscordMessenger(self.configuration['discord_config']['messenger']['webhook'])
-        self.logger = Logger()
+        self.logger = LoggerFactory.get_logger(log_folder=self.log_folder)
 
-        self.add_service("discord_listener", self.discord_listener)
+        self.discord_listener = DiscordListener(discord_config=self.configuration['discord_config'],
+                                                discord_messenger=self.discord_messenger)
+
+        # self.add_service("discord_listener", self.discord_listener)
         self.add_service("discord_messenger", self.discord_messenger)
         self.add_service("logger", self.logger)
 
@@ -37,11 +42,14 @@ class Server(ServerIf):
         self.routes[service] = this_server_url
 
     def register_routes_to_app(self):
-        ret = Request.post(master_server_url + "/route", data=self.routes)
-        print(ret)
+        try:
+            Request.post(master_server_url + "/route", data=self.routes)
+        except Exception:
+            raise
 
 
 app = Flask(__name__)
+server = Server(read())
 
 
 @app.get("/service")
@@ -62,21 +70,22 @@ def call_service():
 
             key = list(routes.keys())[0]
             if key == "logger":
-                server.logger.log(msg=routes[key]['msg'], log_level=LogLevel.Debug)
+                server.logger.info(msg=routes[key]['msg'])
+                response = "LOGGED"
             elif key == "discord_messenger":
                 server.discord_messenger.send_message(channel=routes[key]['channel'],
                                                       msg=routes[key]['msg'],
                                                       title=routes[key]['title'])
+                response = "SENT DISCORD MESSAGE"
             return Request.make_response(error_code=error_code, err_message=err, body=response)
         except Exception as e:
             error_code = ErrorCode.Critical
             err = f"{e.args}"
-            response = e
-            return Request.make_response(error_code=error_code, err_message=err, body=response)
+            server.logger.error(e.args)
+            return Request.make_response(error_code=error_code, err_message=err, body=traceback.format_exc())
     err = f"request must be json"
     return Request.make_response(error_code=ErrorCode.Critical, err_message=err), 415
 
 
 if __name__ == '__main__':
-    server = Server(read())
     app.run(host="localhost", port=8001)

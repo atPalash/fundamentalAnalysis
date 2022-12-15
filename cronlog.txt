@@ -16,3 +16,32 @@ start analysis
 start analysis
 start analysis
 start analysis
+[nltk_data] Downloading package vader_lexicon to /home/pi/nltk_data...
+[nltk_data]   Package vader_lexicon is already up-to-date!
+[nltk_data] Downloading package punkt to /home/pi/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+start analysis
+start batch
+start batch
+[nltk_data] Downloading package vader_lexicon to /home/pi/nltk_data...
+[nltk_data]   Package vader_lexicon is already up-to-date!
+[nltk_data] Downloading package punkt to /home/pi/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+start analysis
+start analysis
+start analysis
+start analysis
+start analysis
+start analysis
+start analysis
+start analysis
+start analysis
+start analysis
+start analysis
+start analysis
+[nltk_data] Downloading package vader_lexicon to /home/pi/nltk_data...
+[nltk_data]   Package vader_lexicon is already up-to-date!
+[nltk_data] Downloading package punkt to /home/pi/nltk_data...
+[nltk_data]   Package punkt is already up-to-date!
+start analysis
+start analysis

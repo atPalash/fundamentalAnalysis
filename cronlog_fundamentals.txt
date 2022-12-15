@@ -17,3 +17,45 @@ Terminated
 /home/pi/Dev/fundamentalAnalysis downloading fundamentals and converting to excel
 (3, 153)
 Elapsed  37.74286937713623
+/home/pi/Dev/fundamentalAnalysis downloading fundamentals and converting to excel
+'NseSymbol'
+(0, 0)
+Elapsed  0.06121635437011719
+Traceback (most recent call last):
+  File "/home/pi/Dev/fundamentalAnalysis/stockFundamentals/key_stats_to_stock_select.py", line 49, in <module>
+    nseStocks = pandas.read_csv(stock_fundamentals_csv_path).fillna(0)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/util/_decorators.py", line 311, in wrapper
+    return func(*args, **kwargs)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/readers.py", line 586, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/readers.py", line 482, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/readers.py", line 811, in __init__
+    self._engine = self._make_engine(self.engine)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/readers.py", line 1040, in _make_engine
+    return mapping[engine](self.f, **self.options)  # type: ignore[call-arg]
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/c_parser_wrapper.py", line 69, in __init__
+    self._reader = parsers.TextReader(self.handles.handle, **kwds)
+  File "pandas/_libs/parsers.pyx", line 549, in pandas._libs.parsers.TextReader.__cinit__
+pandas.errors.EmptyDataError: No columns to parse from file
+/home/pi/Dev/fundamentalAnalysis downloading fundamentals and converting to excel
+'NseSymbol'
+(0, 0)
+Elapsed  0.058587074279785156
+Traceback (most recent call last):
+  File "/home/pi/Dev/fundamentalAnalysis/stockFundamentals/key_stats_to_stock_select.py", line 49, in <module>
+    nseStocks = pandas.read_csv(stock_fundamentals_csv_path).fillna(0)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/util/_decorators.py", line 311, in wrapper
+    return func(*args, **kwargs)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/readers.py", line 586, in read_csv
+    return _read(filepath_or_buffer, kwds)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/readers.py", line 482, in _read
+    parser = TextFileReader(filepath_or_buffer, **kwds)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/readers.py", line 811, in __init__
+    self._engine = self._make_engine(self.engine)
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/readers.py", line 1040, in _make_engine
+    return mapping[engine](self.f, **self.options)  # type: ignore[call-arg]
+  File "/home/pi/Dev/fundamentalAnalysis/.venv/lib/python3.7/site-packages/pandas/io/parsers/c_parser_wrapper.py", line 69, in __init__
+    self._reader = parsers.TextReader(self.handles.handle, **kwds)
+  File "pandas/_libs/parsers.pyx", line 549, in pandas._libs.parsers.TextReader.__cinit__
+pandas.errors.EmptyDataError: No columns to parse from file

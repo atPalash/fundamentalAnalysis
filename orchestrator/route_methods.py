@@ -73,7 +73,8 @@ def headlines(*args):
             ticker = str(user_args[0])
             days = int(user_args[1])
             count = int(user_args[2])
-            head_lines = GoogleNewsHandler.get_headlines(ticker=ticker, past_days=days, max_news_count=count)
+            head_lines = GoogleNewsHandler.get_headlines(
+                ticker=ticker, past_days=days, max_news_count=count)
 
         elif arg_count >= 1:
             ticker = str(user_args[0])
@@ -166,13 +167,14 @@ def highlow52w(*args):
     ---------
     highlow52W: sel, 10 -> shows list of selected stocks within  52 high / low.
     highlow52W: all, 10 -> shows list of all nse stocks at 52 high / low.
-    """ 
+    """
     try:
         configuration = conf_editor.read()
         query = __clean_user_args(args[0].split(","))
         selected_stocks = []
         if query[0] == 'sel':
-            stocks = configuration['selected_stocks_config']['to_buy'] + configuration['selected_stocks_config']['to_sell']
+            stocks = configuration['selected_stocks_config']['to_buy'] + \
+                configuration['selected_stocks_config']['to_sell']
             selected_stocks = [stock + ".NS" for stock in stocks]
         elif query[0] == 'all':
             all_nse_stocks = pandas.read_csv('conf/ind_NseList.csv')['SYMBOL']
@@ -188,7 +190,8 @@ def highlow52w(*args):
         high52w = {}
         low52w = {}
         batch_size = 50
-        batches = [selected_stocks[i:i + batch_size] for i in range(0, len(selected_stocks), batch_size)]
+        batches = [selected_stocks[i:i + batch_size]
+                   for i in range(0, len(selected_stocks), batch_size)]
         # call in batches
         for batch in batches:
             print("start batch")
@@ -232,9 +235,52 @@ def highlow52w(*args):
         print(e)
 
 
+def delivery(*args):
+    try:
+        configuration = conf_editor.read()
+        query = __clean_user_args(args[0].split(","))
+
+        stock = query[0].upper()
+        delivery = pandas.read_csv(
+            '/home/pi/Dev/fundamentalAnalysis/stockFundamentals/database/delivery/delivery.csv')
+        if stock == "TOPDELIVERED":
+            stocks = delivery["Symbol"]
+
+            res = f'lastTraded      | lastDelivered        | meanTraded        | meanDelivered         |'
+            df = pandas.DataFrame()
+            for stk in stocks:
+                data = stocks[delivery["Symbol"] == stk][-1:]
+                df.insert(data)
+                
+                # res+=f'{data["lastTraded"]}      | {data["lastDelivered"]}        | {data["meanTraded"]}        | {data["meanDelivered"]}         |'
+        else:
+            data = getStockDelivery(delivery=delivery, stock=stock)
+            # res = f'lastTraded: {data["lastTraded"]}, totalDelivered: {lastDelivered}, meanTraded: {meanTraded}, meanDelivered: {meanDelivered}'
+        return res
+    except Exception as e:
+        print(e)
+
+
+def getStockDelivery(delivery, stock):
+    stock_delivery = delivery[delivery['Symbol'] == stock]
+    totalTraded = stock_delivery["TotalTradedQuantity"].astype(int)
+    totalDelivered = stock_delivery["DeliverableQty"].astype(int)
+    meanTraded = totalTraded.mean()
+    meanDelivered = totalDelivered.mean()
+    lastTraded = totalTraded.iloc[-1]
+    lastDelivered = totalDelivered.iloc[-1]
+    
+    return dict(lastTraded=lastTraded, lastDelivered=lastDelivered, meanTraded=meanTraded,
+                     meanDelivered=meanDelivered)
+
+
 def __clean_user_args(data: List[str]):
     ret = [x.strip() for x in data]
     return ret
 
 
-route_methods = dict(commands=commands, headlines=headlines, sentiment=sentiment, indicator=indicator, stock=stock, highlow52w=highlow52w)
+route_methods = dict(commands=commands, headlines=headlines, sentiment=sentiment,
+                     indicator=indicator, stock=stock, highlow52w=highlow52w, delivery=delivery)
+
+if __name__ == "__main__":
+    delivery("topDelivered")
